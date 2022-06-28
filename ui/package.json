@@ -7,8 +7,8 @@
     "export": "next build && next export"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^1.9.0",
     "axios": "^0.27.2",
-    "braintree-web-drop-in": "^1.33.2",
     "next": "^12.1.6",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"

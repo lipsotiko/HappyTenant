@@ -41,9 +41,9 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.braintreepayments.gateway</groupId>
-			<artifactId>braintree-java</artifactId>
-			<version>3.16.1</version>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>20.130.0</version>
 		</dependency>
 	</dependencies>
 

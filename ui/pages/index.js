@@ -1,44 +1,37 @@
 import Head from 'next/head'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { CheckoutForm } from '../components/CheckoutForm'
 import axios from 'axios';
-import { create } from 'braintree-web-drop-in';
+
+let stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
 
 export default function Home() {
-
-  const dropinContainerRef = useRef();
+  const [clientSecret, setClientSecret] = useState();
+  const items = [{ id: "xl-tshirt" }];
 
   useEffect(async () => {
-    const { data: { token } } = await axios.get('/api/payment/generate-client-token')
-
-    var button = document.querySelector('#submit-button');
-    create({
-      authorization: token,
-      container: dropinContainerRef.current
-    }, (createError, instance) => {
-      button.addEventListener('click', () => {
-        instance.requestPaymentMethod((requestPaymentMethodErr, payload) => {
-            axios.post('/api/payment/checkouts', null, {
-              params: {
-                amount: '100',
-                paymentMethodNonce: payload.nonce
-              }
-            })
-        });
-      });
-    })
+    const { data: { clientSecret } } = await axios.post('/api/payment/create-payment-intent', { items })
+    setClientSecret(clientSecret)
   }, [])
+
+  const options = {
+    clientSecret,
+  };
 
   return (<>
       <Head>
         <title>Create Next App</title>
         <link rel="icon" href="/favicon.ico" />
+        <script src="https://js.stripe.com/v3/"></script>
       </Head>
       <main>
-        <div id="dropin-wrapper">
-          <div id="checkout-message"></div>
-          <div ref={dropinContainerRef}></div>
-          <button id="submit-button">Submit payment</button>
-        </div>
+        { clientSecret &&
+        <Elements stripe={stripePromise} options={options}>
+          <CheckoutForm />
+        </Elements>
+        }
       </main>
     </>
   )

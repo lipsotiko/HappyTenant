@@ -1,97 +1,61 @@
 package io.meraklis.happy_tenant.payment;
 
-import com.braintreegateway.CreditCard;
-import com.braintreegateway.Customer;
-import com.braintreegateway.Result;
-import com.braintreegateway.Transaction;
-import com.braintreegateway.Transaction.Status;
-import com.braintreegateway.TransactionRequest;
-import com.braintreegateway.ValidationError;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.stripe.Stripe;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
 
-    @Autowired
-    private BraintreeGatewayService gatewayService;
+    @Value("${stripe.private_key}")
+    private String privateKey;
 
-    private final Status[] TRANSACTION_SUCCESS_STATUSES = new Status[]{
-            Transaction.Status.AUTHORIZED,
-            Transaction.Status.AUTHORIZING,
-            Transaction.Status.SETTLED,
-            Transaction.Status.SETTLEMENT_CONFIRMED,
-            Transaction.Status.SETTLEMENT_PENDING,
-            Transaction.Status.SETTLING,
-            Transaction.Status.SUBMITTED_FOR_SETTLEMENT
-    };
+    @PostMapping("/create-payment-intent")
+    public CreatePaymentResponse createPaymentIntent(CreatePayment createPayment) throws StripeException {
+        Stripe.apiKey = privateKey;
 
-    @GetMapping(value = "/generate-client-token")
-    public Map<String, String> checkout() {
-        return Collections.singletonMap("token", gatewayService.gateway().clientToken().generate());
+        PaymentIntentCreateParams params =
+                PaymentIntentCreateParams.builder()
+                        .setAmount((long) calculateOrderAmount(createPayment.getItems()))
+                        .setCurrency("eur")
+                        .setAutomaticPaymentMethods(
+                                PaymentIntentCreateParams.AutomaticPaymentMethods
+                                        .builder()
+                                        .setEnabled(true)
+                                        .build()
+                        )
+                        .build();
+
+        PaymentIntent paymentIntent = PaymentIntent.create(params);
+        return new CreatePaymentResponse(paymentIntent.getClientSecret());
     }
 
-    @PostMapping(value = "/checkouts")
-    public String postForm(@RequestParam("amount") String amount, @RequestParam("paymentMethodNonce") String nonce)
-            throws Exception {
-        BigDecimal decimalAmount;
-        decimalAmount = new BigDecimal(amount);
+    @Data
+    static class CreatePayment {
 
-        TransactionRequest request = new TransactionRequest()
-                .amount(decimalAmount)
-                .paymentMethodNonce(nonce)
-                .options()
-                .submitForSettlement(true)
-                .done();
-
-        Result<Transaction> result = gatewayService.gateway().transaction().sale(request);
-
-        if (result.isSuccess() || result.getTransaction() != null) {
-            Transaction transaction = result.getTarget();
-            return transaction.getId();
-        } else {
-            StringBuilder errorString = new StringBuilder();
-            for (ValidationError error : result.getErrors().getAllDeepValidationErrors()) {
-                errorString.append("Error: ").append(error.getCode()).append(": ").append(error.getMessage())
-                        .append("\n");
-            }
-            throw new Exception(errorString.toString());
-        }
+        private Object[] items;
     }
 
-    @GetMapping(value = "/checkouts/{transactionId}")
-    public Map<String, Object> getTransaction(@PathVariable String transactionId) {
-        Transaction transaction;
-        CreditCard creditCard;
-        Customer customer;
+    @Data
+    @AllArgsConstructor
+    static class CreatePaymentResponse {
 
-        try {
-            transaction = gatewayService.gateway().transaction().find(transactionId);
-            creditCard = transaction.getCreditCard();
-            customer = transaction.getCustomer();
-        } catch (Exception e) {
-            System.out.println("Exception: " + e);
-            return null;
-        }
-
-        Map<String, Object> transactionResults = new HashMap<>();
-        transactionResults.put("isSuccess",
-                Arrays.asList(TRANSACTION_SUCCESS_STATUSES).contains(transaction.getStatus()));
-        transactionResults.put("transaction", transaction);
-        transactionResults.put("creditCard", creditCard);
-        transactionResults.put("customer", customer);
-
-        return transactionResults;
+        private String clientSecret;
     }
+
+    static int calculateOrderAmount(Object[] items) {
+        // Replace this constant with a calculation of the order's amount
+        // Calculate the order total on the server to prevent
+        // people from directly manipulating the amount on the client
+        return 1400;
+    }
+
 }
