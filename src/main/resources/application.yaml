@@ -1,5 +1,2 @@
-braintree:
-  environment: ${BRAINTREE_ENVIRONMENT}
-  merchant_id: ${BRAINTREE_MERCHANT_ID}
-  public_key: ${BRAINTREE_PUBLIC_KEY}
-  private_key: ${BRAINTREE_PRIVATE_KEY}
+stripe:
+  private_key: ${STRIPE_PRIVATE_KEY}
