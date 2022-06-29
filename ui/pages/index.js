@@ -1,8 +1,9 @@
-import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import { CheckoutForm } from '../components/CheckoutForm'
+import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Typography from '@mui/material/Typography';
+import CheckoutForm from '../components/CheckoutForm'
 import axios from 'axios';
 
 let stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
@@ -16,23 +17,17 @@ export default function Home() {
     setClientSecret(clientSecret)
   }, [])
 
-  const options = {
-    clientSecret,
-  };
-
   return (<>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-        <script src="https://js.stripe.com/v3/"></script>
-      </Head>
-      <main>
-        { clientSecret &&
-        <Elements stripe={stripePromise} options={options}>
+      <Breadcrumbs aria-label="breadcrumb">
+        <Typography color="text.primary">Dashboard</Typography>
+      </Breadcrumbs>
+      { clientSecret &&
+        <Elements stripe={stripePromise} options={{
+          clientSecret,
+        }}>
           <CheckoutForm />
         </Elements>
-        }
-      </main>
+      }
     </>
   )
 }
