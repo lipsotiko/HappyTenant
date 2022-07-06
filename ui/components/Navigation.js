@@ -25,7 +25,7 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth0 } from "@auth0/auth0-react";
-import useAuth from '../../hooks/useAuth'
+import useAuth from '../hooks/useAuth'
 import { useRouter } from 'next/router';
 
 const drawerWidth = 188;
@@ -156,6 +156,12 @@ const Navigation = (props) => {
   ];
 
   useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/login')
+    }
+  }, [isLoading, isAuthenticated])
+
+  useEffect(() => {
     const item = menuItems.find(item => item.route === router.pathname)
     if (item) {
       setSelected(item.name)
@@ -176,8 +182,8 @@ const Navigation = (props) => {
     return <>loading...</>
   }
 
-  if (!isAuthenticated) {
-    return <>{props.children}</>
+  if (!isLoading && !isAuthenticated) {
+    return <>{ props.children }</>
   }
 
   return (

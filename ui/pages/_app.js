@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import Navigation from './../components/Navigation/Navigation'
+import Navigation from '../components/Navigation'
 import { Auth0Provider } from "@auth0/auth0-react";
 
 const App = ({ Component, pageProps }) => {
