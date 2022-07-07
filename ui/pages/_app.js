@@ -1,6 +1,8 @@
 import Head from 'next/head'
 import Navigation from '../components/Navigation'
 import { Auth0Provider } from "@auth0/auth0-react";
+import GlobalStyles from '@mui/material/GlobalStyles';
+import styles from '../style/styles.js'
 
 const App = ({ Component, pageProps }) => {
   return <>
@@ -22,6 +24,7 @@ const App = ({ Component, pageProps }) => {
         audience={process.env.NEXT_PUBLIC_AUTH0_AUDIENCE}
         scope={process.env.NEXT_PUBLIC_AUTH0_SCOPE}
         >
+          <GlobalStyles styles={styles} />
           <Navigation>
             <main>
               <Component {...pageProps} />

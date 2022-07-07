@@ -2,7 +2,6 @@ import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
-import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { useForm } from 'react-hook-form';
@@ -17,7 +16,7 @@ const SignUp = () => {
 
   const onSubmit = async data => {
     setSaving(true)
-    await axios.post('/api/users', data)
+    await axios.post('/api/sign-up/owner', data)
     setShowSuccess(true)
   };
 
@@ -75,9 +74,8 @@ const SignUp = () => {
             required
             margin="normal"
             size="small"
-            variant="outlined"
             label="Full Name"
-            helperText={showHelperText('fullName', )}
+            helperText={showHelperText('fullName')}
             error={showError('fullName')  }
             />
           <TextField
@@ -86,7 +84,6 @@ const SignUp = () => {
             required
             margin="normal"
             size="small"
-            variant="outlined"
             label="Email"
             helperText={showHelperText('email')}
             error={showError('email')  }
@@ -96,7 +93,6 @@ const SignUp = () => {
             fullWidth
             margin="normal"
             size="small"
-            variant="outlined"
             label="Organization"
             />
           <TextField
@@ -108,7 +104,6 @@ const SignUp = () => {
             required
             margin="normal"
             size="small"
-            variant="outlined"
             type="password"
             label="Password"
             helperText={showHelperText('password')}
@@ -124,7 +119,6 @@ const SignUp = () => {
             type="password"
             margin="normal"
             size="small"
-            variant="outlined"
             label="Verify Password"
             helperText={showHelperText('verifyPassword')}
             error={showError('verifyPassword')  }

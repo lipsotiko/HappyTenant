@@ -1,33 +1,74 @@
 import { useEffect, useState } from 'react'
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
+
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
-import CheckoutForm from '../components/CheckoutForm'
+import Button from '@mui/material/Button';
+import { DataGrid } from '@mui/x-data-grid';
+import Box from '@mui/material/Box';
+import { useRouter } from 'next/router';
+import { useAuth0 } from "@auth0/auth0-react";
+import useAuth from '../hooks/useAuth'
 import axios from 'axios';
 
-let stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY)
+const Properties = () => {
+  const { user } = useAuth0();
+  const { tokenized } = useAuth();
+  const router = useRouter();
+  const [properties, setProperties] = useState([])
 
-export default function Home() {
-  const [clientSecret, setClientSecret] = useState();
-  const items = [{ id: "xl-tshirt" }];
+  const columns = [
+    {
+      field: 'address',
+      headerName: 'Address',
+      width: 168
+    }, {
+      field: 'city',
+      headerName: 'City',
+      width: 148
+    }, {
+      field: 'state',
+      headerName: 'State',
+      width: 148
+    }, {
+      field: 'country',
+      headerName: 'Country',
+      width: 148
+    }, {
+      field: 'rent',
+      headerName: 'Rent ($)',
+      width: 100
+    }, {
+      field: 'deposit',
+      headerName: 'Deposit ($)',
+      width: 100
+    }
+  ]
 
   useEffect(async () => {
-    const { data: { clientSecret } } = await axios.post('/api/payment/create-payment-intent', { items })
-    setClientSecret(clientSecret)
-  }, [])
-
-  return (<>
-      <Breadcrumbs aria-label="breadcrumb">
-        <Typography color="text.primary">Dashboard</Typography>
-      </Breadcrumbs>
-      { clientSecret &&
-        <Elements stripe={stripePromise} options={{
-          clientSecret,
-        }}>
-          <CheckoutForm />
-        </Elements>
+    if (!tokenized) return
+    const { data: { _embedded: { properties }} } = await axios.get('/api/properties/search/findByCreatedBy', {
+      params: {
+        email: user.email
       }
-    </>
-  )
+    })
+    setProperties(properties)
+  }, [tokenized])
+
+  return <>
+    <Breadcrumbs aria-label="breadcrumb">
+      <Typography color="text.primary">Properties</Typography>
+    </Breadcrumbs>
+    <Box m={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <Button onClick={() => router.push('/properties/create')}>Create</Button>
+    </Box>
+    <Box sx={{ height: 400, width: '100%' }}>
+      <DataGrid
+        rows={properties}
+        columns={columns}
+        disableSelectionOnClick
+      />
+    </Box>
+  </>
 }
+
+export default Properties

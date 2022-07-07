@@ -16,17 +16,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import GroupsIcon from '@mui/icons-material/Groups';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
-import HandymanIcon from '@mui/icons-material/Handyman';
 import SettingsIcon from '@mui/icons-material/Settings';
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth0 } from "@auth0/auth0-react";
-import useAuth from '../hooks/useAuth'
 import { useRouter } from 'next/router';
+import { HOME_ROUTE, TENANTS_ROUTE } from '../util/constants'
 
 const drawerWidth = 188;
 
@@ -96,8 +95,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 );
 
 const Navigation = (props) => {
-  const { isLoading, isAuthenticated } = useAuth();
-  const { logout } = useAuth0();
+  const { isLoading, isAuthenticated, logout, user } = useAuth0();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [openedViaMenu, setOpenedViaMenu] = useState(false)
@@ -133,25 +131,25 @@ const Navigation = (props) => {
 
   const menuItems = [
     {
-      name: 'Dashboard',
-      icon: <DashboardIcon />,
-      route: '/'
-    }, {
       name: 'Properties',
       icon: <MapsHomeWorkIcon />,
-      route: '/properties'
+      route: HOME_ROUTE,
+      visible: true
     }, {
       name: 'Tenants',
       icon: <GroupsIcon />,
-      route: '/tenants'
-    }, {
-      name: 'Maintenance',
-      icon: <HandymanIcon />,
-      route: '/maintenance'
+      route: TENANTS_ROUTE,
+      visible: true
     }, {
       name: 'Settings',
       icon: <SettingsIcon />,
-      route: '/settings'
+      route: '/settings',
+      visible: true
+    }, {
+      name: 'Admin Panel',
+      icon: <AdminPanelSettingsIcon />,
+      route: '/admin',
+      visible: user?.email === 'evangelos@meraklis.io'
     }
   ];
 
@@ -178,11 +176,7 @@ const Navigation = (props) => {
     router.push('/profile')
   }
 
-  if (isLoading) {
-    return <>loading...</>
-  }
-
-  if (!isLoading && !isAuthenticated) {
+  if (isLoading || !isAuthenticated) {
     return <>{ props.children }</>
   }
 
@@ -241,7 +235,7 @@ const Navigation = (props) => {
         <Divider />
         <nav>
           <List>
-            {menuItems.map((i) => (
+            {menuItems.filter(i => i.visible).map((i) => (
               <ListItem key={i.name} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton
                   sx={{
@@ -268,7 +262,7 @@ const Navigation = (props) => {
           </List>
         </nav>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
         { props.children }
       </Box>

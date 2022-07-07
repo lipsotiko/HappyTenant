@@ -1,8 +1,6 @@
 package io.meraklis.happy_tenant.security;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import io.meraklis.happy_tenant.security.user_email.Auth0UserEmail;
-import io.meraklis.happy_tenant.security.user_email.Auth0UserEmailRepository;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -32,9 +30,7 @@ public class Auth0SecurityService implements SecurityService {
 
     private final RestTemplate restTemplate = new RestTemplate();
     @Autowired
-    private Auth0UserEmailRepository auth0UserEmailRepository;
-    @Autowired
-    private TokenRefreshService tokenRefreshService;
+    private TokenValidatorService tokenValidatorService;
 
     @Override
     public void createUser(Map<String, String> user) {
@@ -50,9 +46,6 @@ public class Auth0SecurityService implements SecurityService {
         ResponseEntity<Auth0User> exchange = restTemplate.exchange(api, HttpMethod.POST, requestEntity,
                 Auth0User.class);
         Auth0User body = exchange.getBody();
-
-        Auth0UserEmail auth0UserEmail = new Auth0UserEmail(body.getUser_id(), body.getEmail());
-        auth0UserEmailRepository.save(auth0UserEmail);
     }
 
     @Override
@@ -64,7 +57,6 @@ public class Auth0SecurityService implements SecurityService {
             Map<String, String> params = new HashMap<>();
             params.put("userId", userId);
             restTemplate.exchange(api, HttpMethod.DELETE, requestEntity, Void.class, params);
-            auth0UserEmailRepository.deleteByUserId(userId);
         });
     }
 
@@ -102,13 +94,13 @@ public class Auth0SecurityService implements SecurityService {
     private HttpHeaders headers() {
         HttpHeaders httpHeaders = new HttpHeaders();
 
-        if (!tokenRefreshService.isValid()) {
+        if (!tokenValidatorService.isValid()) {
             Auth0Token auth0Token = accessToken();
-            tokenRefreshService.setToken(auth0Token.getAccess_token());
-            tokenRefreshService.setExpires(auth0Token.getExpires_in());
+            tokenValidatorService.setToken(auth0Token.getAccess_token());
+            tokenValidatorService.setExpires(auth0Token.getExpires_in());
         }
 
-        httpHeaders.setBearerAuth(tokenRefreshService.getToken());
+        httpHeaders.setBearerAuth(tokenValidatorService.getToken());
         return httpHeaders;
     }
 

@@ -1,9 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from 'axios';
 
 const useAuth = () => {
+  const [hasToken, setHasToken] = useState(false)
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+
+  const tokenized = useMemo(() => {
+    return hasToken
+  }, [hasToken])
 
   useEffect(() => {
     const getToken = async () => {
@@ -12,6 +17,7 @@ const useAuth = () => {
         request.headers['Authorization'] = `Bearer ${accessToken}`
         return request
       })
+      setHasToken(true)
     }
 
     if (!isLoading && isAuthenticated) {
@@ -20,7 +26,7 @@ const useAuth = () => {
   }, [isLoading, isAuthenticated])
 
   return {
-    user, isAuthenticated, isLoading
+    user, tokenized
   }
 }
 

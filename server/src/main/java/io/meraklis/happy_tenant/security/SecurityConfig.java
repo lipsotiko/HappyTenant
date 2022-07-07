@@ -29,17 +29,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         OAuth2TokenValidator<Jwt> audienceValidator = new Auth0AudienceValidator(audience);
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuer);
-        OAuth2TokenValidator<Jwt> withAudience = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
+        OAuth2TokenValidator<Jwt> validator = new DelegatingOAuth2TokenValidator<>(withIssuer, audienceValidator);
 
-        jwtDecoder.setJwtValidator(withAudience);
+        jwtDecoder.setJwtValidator(validator);
 
         return jwtDecoder;
     }
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .mvcMatchers("/").permitAll()
-                .mvcMatchers(HttpMethod.POST, "/api/users").permitAll()
+                .mvcMatchers(HttpMethod.POST, "/api/sign-up/**").permitAll()
 //                .mvcMatchers("/api/private-scoped").hasAuthority("SCOPE_read:messages")
                 .mvcMatchers("/api/**").authenticated()
                 .and().cors()
