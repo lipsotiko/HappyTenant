@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
 import { useAuth0 } from "@auth0/auth0-react";
@@ -16,6 +17,7 @@ const Tenants = () => {
   const { tokenized } = useAuth();
   const router = useRouter();
   const [tenants, setTenants] = useState([])
+  const [selectedTenantIds, setSelectedTenantIds] = useState([])
 
   const columns = [
     {
@@ -38,7 +40,7 @@ const Tenants = () => {
       headerName: 'Actions',
       width: 158,
       renderCell: (params) => <>
-        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
+        <Link id={`invite${params.row.id}`} className='pointer' onClick={() => handleInvite(params.row.id)}>Invite</Link>
       </>
     }
   ]
@@ -57,9 +59,15 @@ const Tenants = () => {
     getTenants()
   }, [tokenized])
 
-  const handleDelete = async (tenantId) => {
-    await axios.delete(`/api/tenants/${tenantId}`)
+  const handleDelete = async () => {
+    console.log(selectedTenantIds)
+    await Promise.all(
+      selectedTenantIds.map((tenantId) => axios.delete(`/api/tenants/${tenantId}`)))
     getTenants()
+  }
+
+  const handleInvite = (tenantId) => {
+    console.log('Invite tenant: ', tenantId)
   }
 
   return <>
@@ -73,8 +81,15 @@ const Tenants = () => {
       <DataGrid
         rows={tenants}
         columns={columns}
+        checkboxSelection
         disableSelectionOnClick
+        onSelectionModelChange={setSelectedTenantIds}
       />
+    </Box>
+    <Box sx={{ display: 'flex', justifyContent: 'center', margin: '12px'}}>
+      <Button variant="outlined" color="error" startIcon={<DeleteIcon />} disabled={selectedTenantIds.length === 0} onClick={handleDelete}>
+        Delete
+      </Button>
     </Box>
   </>
 }

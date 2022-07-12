@@ -21,7 +21,7 @@ const Properties = () => {
     {
       field: 'address',
       headerName: 'Address',
-      width: 168
+      width: 188
     }, {
       field: 'city',
       headerName: 'City',
@@ -29,7 +29,7 @@ const Properties = () => {
     }, {
       field: 'state',
       headerName: 'State',
-      width: 148
+      width: 100
     }, {
       field: 'country',
       headerName: 'Country',
