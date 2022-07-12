@@ -1,5 +1,5 @@
 export default {
-    '.breadcrumbLink': {
+  '.pointer': {
     cursor: 'pointer'
-  }
+  },
 }

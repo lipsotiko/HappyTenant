@@ -4,15 +4,10 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import useAuth from '../../hooks/useAuth'
 import axios from 'axios';
-import styles from './admin.module.css'
 
 const Admin = () => {
   const { tokenized } = useAuth();
   const [landlords, setLandlords] = useState([])
-
-  const handleDelete = async (landlordId) => {
-    await axios.delete(`/api/landlords/${landlordId}`)
-  }
 
   const columns = [
     {
@@ -32,20 +27,33 @@ const Admin = () => {
       headerName: 'Email',
       width: 244
     }, {
+      field: 'createdDate',
+      headerName: 'Created',
+      width: 188
+    }, {
       field: 'actions',
       headerName: 'Actions',
       width: 158,
       renderCell: (params) => <>
-        <Link id={`delete_${params.row.id}`} className={styles.action} onClick={() => handleDelete(params.row.id)}>Delete</Link>
+        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
       </>
     }
   ]
 
-  useEffect(async () => {
-    if (!tokenized) return
+  const getLandlords = async () => {
     const { data: { _embedded: { landlords }} } = await axios.get('/api/landlords')
     setLandlords(landlords)
+  }
+
+  useEffect(async () => {
+    if (!tokenized) return
+    getLandlords()
   }, [tokenized])
+
+  const handleDelete = async (landlordId) => {
+    await axios.delete(`/api/landlords/${landlordId}`)
+    getLandlords()
+  }
 
   return <>
     <p>Landlords</p>

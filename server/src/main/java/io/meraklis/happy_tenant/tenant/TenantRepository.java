@@ -6,7 +6,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 @RepositoryRestResource
-@PreAuthorize("hasPermission(#entity, 'ADMIN')")
 public interface TenantRepository extends MongoRepository<Tenant, String> {
 
     @Override
@@ -14,7 +13,7 @@ public interface TenantRepository extends MongoRepository<Tenant, String> {
     Tenant save(Tenant tenant);
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Tenant', 'DELETE_BY_ID')")
+    @PreAuthorize("hasPermission(#id, 'tenant', 'DELETE_BY_ID')")
     void deleteById(String id);
 
     @PreAuthorize("hasPermission(#email, 'READ_BY_EMAIL')")

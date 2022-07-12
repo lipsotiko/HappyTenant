@@ -56,7 +56,7 @@ const Create = () => {
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">
-      <Link className="breadcrumbLink" underline="hover" color="inherit" onClick={() => router.push(TENANTS_ROUTE)} >
+      <Link className="pointer" underline="hover" color="inherit" onClick={() => router.push(TENANTS_ROUTE)} >
         Tenants
       </Link>
       <Typography color="text.primary">Create</Typography>

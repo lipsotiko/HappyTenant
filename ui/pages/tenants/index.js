@@ -4,6 +4,7 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Link from '@mui/material/Link';
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
 import { useAuth0 } from "@auth0/auth0-react";
@@ -32,18 +33,34 @@ const Tenants = () => {
       valueGetter: (params) => {
         return params.row.property.address
       }
+    }, {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 158,
+      renderCell: (params) => <>
+        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
+      </>
     }
   ]
 
-  useEffect(async () => {
-    if (!tokenized) return
+  const getTenants = async () => {
     const { data } = await axios.get('/api/tenants/all', {
       params: {
         email: user.email
       }
     })
     setTenants(data)
+  }
+
+  useEffect(async () => {
+    if (!tokenized) return
+    getTenants()
   }, [tokenized])
+
+  const handleDelete = async (tenantId) => {
+    await axios.delete(`/api/tenants/${tenantId}`)
+    getTenants()
+  }
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">

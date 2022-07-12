@@ -13,7 +13,7 @@ public interface PropertyRepository extends MongoRepository<Property, String> {
     Property save(Property property);
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Property', 'DELETE_BY_ID')")
+    @PreAuthorize("hasPermission(#id, 'property', 'DELETE_BY_ID')")
     void deleteById(String id);
 
     @PreAuthorize("hasPermission(#email, 'READ_BY_EMAIL')")

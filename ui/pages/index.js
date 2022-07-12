@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import Link from '@mui/material/Link';
 import { useRouter } from 'next/router';
 import { useAuth0 } from "@auth0/auth0-react";
 import useAuth from '../hooks/useAuth'
@@ -41,18 +42,34 @@ const Properties = () => {
       field: 'deposit',
       headerName: 'Deposit ($)',
       width: 100
+    }, {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 158,
+      renderCell: (params) => <>
+        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
+      </>
     }
   ]
 
-  useEffect(async () => {
-    if (!tokenized) return
+  const getProperties = async () => {
     const { data: { _embedded: { properties }} } = await axios.get('/api/properties/search/findByCreatedBy', {
       params: {
         email: user.email
       }
     })
     setProperties(properties)
+  }
+
+  useEffect(async () => {
+    if (!tokenized) return
+    getProperties()
   }, [tokenized])
+
+  const handleDelete = async (propertyId) => {
+    await axios.delete(`/api/properties/${propertyId}`)
+    getProperties()
+  }
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">
