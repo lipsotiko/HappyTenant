@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useAuth0 } from "@auth0/auth0-react";
-import useAuth from '../../hooks/useAuth'
+import useAuth from 'hooks/useAuth'
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import { getLayout } from 'components/layouts/LandlordLayout'
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 
@@ -100,5 +101,7 @@ const Profile = () => {
     </form>
   </>
 }
+
+Profile.getLayout = getLayout;
 
 export default Profile

@@ -1,5 +1,6 @@
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
+import { getLayout } from 'components/layouts/LandlordLayout'
 
 const Settings = () => {
   return <>
@@ -8,5 +9,7 @@ const Settings = () => {
     </Breadcrumbs>
   </>
 }
+
+Settings.getLayout = getLayout;
 
 export default Settings

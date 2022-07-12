@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import styles from './Login.module.css'
 import { useRouter } from 'next/router';
-import LoginButton from '../../components/LoginButton'
+import LoginButton from 'components/LoginButton'
 
 const Login = () => {
   const { push } = useRouter();

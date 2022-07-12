@@ -6,10 +6,11 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { getLayout } from 'components/layouts/LandlordLayout'
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
 import { useAuth0 } from "@auth0/auth0-react";
-import useAuth from '../../hooks/useAuth'
+import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 
 const Tenants = () => {
@@ -93,5 +94,7 @@ const Tenants = () => {
     </Box>
   </>
 }
+
+Tenants.getLayout = getLayout
 
 export default Tenants

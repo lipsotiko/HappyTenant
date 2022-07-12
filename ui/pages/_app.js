@@ -1,10 +1,11 @@
 import Head from 'next/head'
-import Navigation from '../components/Navigation'
 import { Auth0Provider } from "@auth0/auth0-react";
 import GlobalStyles from '@mui/material/GlobalStyles';
-import styles from '../style/styles.js'
+import styles from 'style/styles.js'
 
 const App = ({ Component, pageProps }) => {
+  const getLayout = Component.getLayout || (page => page)
+
   return <>
     <Head>
       <title>Happy Tenant | Meraklis.io</title>
@@ -25,11 +26,7 @@ const App = ({ Component, pageProps }) => {
         scope={process.env.NEXT_PUBLIC_AUTH0_SCOPE}
         >
           <GlobalStyles styles={styles} />
-          <Navigation>
-            <main>
-              <Component {...pageProps} />
-            </main>
-          </Navigation>
+          { getLayout(<Component {...pageProps} />) }
       </Auth0Provider>
     </main>
   </>

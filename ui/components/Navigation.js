@@ -177,7 +177,7 @@ const Navigation = (props) => {
   }
 
   if (isLoading || !isAuthenticated) {
-    return <>{ props.children }</>
+    return <></>
   }
 
   return (

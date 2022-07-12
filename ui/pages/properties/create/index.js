@@ -10,8 +10,8 @@ import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import useAuth from '../../../hooks/useAuth'
-import { HOME_ROUTE } from '../../../util/constants'
+import useAuth from 'hooks/useAuth'
+import { HOME_ROUTE } from 'util/constants'
 
 const Create = () => {
   const router = useRouter();

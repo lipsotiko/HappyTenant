@@ -5,7 +5,7 @@ import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { useForm } from 'react-hook-form';
-import LoginButton from '../../components/LoginButton'
+import LoginButton from 'components/LoginButton'
 import axios from 'axios';
 
 

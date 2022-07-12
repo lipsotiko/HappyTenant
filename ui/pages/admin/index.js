@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
-import useAuth from '../../hooks/useAuth'
+import { getLayout } from 'components/layouts/LandlordLayout'
+import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 
 const Admin = () => {
@@ -66,5 +67,7 @@ const Admin = () => {
     </Box>
   </>
 }
+
+Admin.getLayout = getLayout;
 
 export default Admin

@@ -11,12 +11,13 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import { getLayout } from 'components/layouts/LandlordLayout'
 import { useRouter } from 'next/router';
 import { useForm, Controller } from 'react-hook-form';
 import axios from 'axios';
-import useAuth from '../../../hooks/useAuth'
+import useAuth from 'hooks/useAuth'
 import { useAuth0 } from "@auth0/auth0-react";
-import { TENANTS_ROUTE } from '../../../util/constants'
+import { TENANTS_ROUTE } from 'util/constants'
 
 const Create = () => {
   const { user } = useAuth0();
@@ -120,5 +121,7 @@ const Create = () => {
     </form>
   </>
 }
+
+Create.getLayout = getLayout
 
 export default Create
