@@ -1,37 +1,32 @@
 import Navigation from 'components/Navigation'
 import { Auth0Provider } from "@auth0/auth0-react";
-import GroupsIcon from '@mui/icons-material/Groups';
-import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
+import Home from '@mui/icons-material/Home';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { MANAGEMENT_PORTAL_BASE_ROUTE, TENANTS_ROUTE } from 'util/constants'
+import { TENANT_PORTAL_BASE_ROUTE } from 'util/constants'
 
 export const getLayout = page => {
   return <Auth0Provider
     domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN}
     clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}
-    redirectUri={'http://localhost:3000'}
+    redirectUri={`http://localhost:3000${TENANT_PORTAL_BASE_ROUTE}`}
     audience={process.env.NEXT_PUBLIC_AUTH0_AUDIENCE}
     scope={process.env.NEXT_PUBLIC_AUTH0_SCOPE}
     >
     <Navigation
-      subtitle="Management Portal"
+      subtitle="Tenant Portal"
       menuItems={[
         {
-          name: 'Properties',
-          icon: <MapsHomeWorkIcon />,
-          route: MANAGEMENT_PORTAL_BASE_ROUTE
-        }, {
-          name: 'Tenants',
-          icon: <GroupsIcon />,
-          route: TENANTS_ROUTE
+          name: 'Home',
+          icon: <Home />,
+          route: TENANT_PORTAL_BASE_ROUTE
         }, {
           name: 'Settings',
           icon: <SettingsIcon />,
-          route: '/settings'
+          route: `${TENANT_PORTAL_BASE_ROUTE}/settings`
         }
       ]}
-      loginRedirect="/login"
-      profilePath="/profile"
+      loginRedirect={`${TENANT_PORTAL_BASE_ROUTE}/login`}
+      profilePath={`${TENANT_PORTAL_BASE_ROUTE}/profile`}
     >
       {page}
     </Navigation>

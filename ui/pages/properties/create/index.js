@@ -11,9 +11,10 @@ import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
 import useAuth from 'hooks/useAuth'
-import { HOME_ROUTE } from 'util/constants'
+import { MANAGEMENT_PORTAL_BASE_ROUTE } from 'util/constants'
+import { getLayout } from 'components/layouts/LandlordLayout'
 
-const Create = () => {
+const CreateProperty = () => {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -22,7 +23,7 @@ const Create = () => {
   const onSubmit = async data => {
     setSaving(true)
     await axios.post('/api/properties', data)
-    router.push(HOME_ROUTE)
+    router.push(MANAGEMENT_PORTAL_BASE_ROUTE)
   }
 
   const showHelperText = (name) => {
@@ -35,7 +36,7 @@ const Create = () => {
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">
-      <Link className="pointer" underline="hover" color="inherit" onClick={() => router.push(HOME_ROUTE)} >
+      <Link className="pointer" underline="hover" color="inherit" onClick={() => router.push(MANAGEMENT_PORTAL_BASE_ROUTE)} >
         Properties
       </Link>
       <Typography color="text.primary">Create</Typography>
@@ -151,4 +152,6 @@ const Create = () => {
   </>
 }
 
-export default Create
+CreateProperty.getLayout = getLayout
+
+export default CreateProperty

@@ -6,9 +6,9 @@ import Container from '@mui/material/Container';
 import styles from './Login.module.css'
 import { useRouter } from 'next/router';
 import LoginButton from 'components/LoginButton'
-import { getLayout } from 'components/layouts/LandlordSignupLayout'
+import { getLayout } from 'components/layouts/TenantSignupLayout'
 
-const Login = () => {
+const TenantLogin = () => {
   const { push } = useRouter();
 
   return <>
@@ -17,7 +17,7 @@ const Login = () => {
       justifyContent: 'flex-end'
     }}>
       <Typography className={styles.dontHaveAccount}>Don't have an account? </Typography>
-      <Button variant="outlined" onClick={() => push('/signup')}>Sign Up</Button>
+      <Button variant="outlined" onClick={() => push('/tenant-portal/signup')}>Sign Up</Button>
     </Box>
     <Container maxWidth="sm">
       <Box m={2}>
@@ -32,6 +32,6 @@ const Login = () => {
   </>
 }
 
-Login.getLayout = getLayout
+TenantLogin.getLayout = getLayout
 
-export default Login
+export default TenantLogin

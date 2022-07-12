@@ -1,5 +1,4 @@
 import Head from 'next/head'
-import { Auth0Provider } from "@auth0/auth0-react";
 import GlobalStyles from '@mui/material/GlobalStyles';
 import styles from 'style/styles.js'
 
@@ -18,16 +17,8 @@ const App = ({ Component, pageProps }) => {
       />
     </Head>
     <main>
-      <Auth0Provider
-        domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN}
-        clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}
-        redirectUri={'http://localhost:3000'}
-        audience={process.env.NEXT_PUBLIC_AUTH0_AUDIENCE}
-        scope={process.env.NEXT_PUBLIC_AUTH0_SCOPE}
-        >
-          <GlobalStyles styles={styles} />
-          { getLayout(<Component {...pageProps} />) }
-      </Auth0Provider>
+        <GlobalStyles styles={styles} />
+        { getLayout(<Component {...pageProps} />) }
     </main>
   </>
 }

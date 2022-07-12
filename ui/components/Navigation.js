@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import MuiDrawer from '@mui/material/Drawer';
@@ -16,16 +16,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import GroupsIcon from '@mui/icons-material/Groups';
-import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
-import SettingsIcon from '@mui/icons-material/Settings';
 import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from 'next/router';
-import { HOME_ROUTE, TENANTS_ROUTE } from '../util/constants'
 
 const drawerWidth = 188;
 
@@ -94,7 +90,7 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
   }),
 );
 
-const Navigation = (props) => {
+const Navigation = ({ children, subtitle, profilePath, menuItems = [], loginRedirect}) => {
   const { isLoading, isAuthenticated, logout, user } = useAuth0();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -129,33 +125,9 @@ const Navigation = (props) => {
     setAnchorEl(null);
   };
 
-  const menuItems = [
-    {
-      name: 'Properties',
-      icon: <MapsHomeWorkIcon />,
-      route: HOME_ROUTE,
-      visible: true
-    }, {
-      name: 'Tenants',
-      icon: <GroupsIcon />,
-      route: TENANTS_ROUTE,
-      visible: true
-    }, {
-      name: 'Settings',
-      icon: <SettingsIcon />,
-      route: '/settings',
-      visible: true
-    }, {
-      name: 'Admin Panel',
-      icon: <AdminPanelSettingsIcon />,
-      route: '/admin',
-      visible: user?.email === 'evangelos@meraklis.io'
-    }
-  ];
-
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push('/login')
+      router.push(loginRedirect)
     }
   }, [isLoading, isAuthenticated])
 
@@ -173,8 +145,21 @@ const Navigation = (props) => {
 
   const handleProfileSelect = () => {
     setSelected(undefined)
-    router.push('/profile')
+    router.push(profilePath)
   }
+
+  const menuItemsMemo = useMemo(() => {
+    if (user?.email === 'evangelos@meraklis.io') {
+      let adminMenuItems = [...menuItems]
+      adminMenuItems.push({
+        name: 'Admin Panel',
+        icon: <AdminPanelSettingsIcon />,
+        route: '/admin'
+      })
+      return adminMenuItems
+    }
+    return menuItems
+  }, [isAuthenticated, isLoading])
 
   if (isLoading || !isAuthenticated) {
     return <></>
@@ -197,8 +182,8 @@ const Navigation = (props) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Happy Tenant
+          <Typography component="div" variant="subtitle1" sx={{ flexGrow: 1 }}>
+            {subtitle}
           </Typography>
           <div>
             <IconButton
@@ -235,7 +220,7 @@ const Navigation = (props) => {
         <Divider />
         <nav>
           <List>
-            {menuItems.filter(i => i.visible).map((i) => (
+            {menuItemsMemo.map((i) => (
               <ListItem key={i.name} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton
                   sx={{
@@ -264,7 +249,7 @@ const Navigation = (props) => {
       </Drawer>
       <Box sx={{ flexGrow: 1, p: 3 }}>
         <DrawerHeader />
-        { props.children }
+        { children }
       </Box>
     </Box>
   );
