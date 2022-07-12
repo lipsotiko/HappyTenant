@@ -17,3 +17,4 @@ auth0:
   audience: "https://happy-tenant.meraklis.io/api"
   client_id: ${AUTH0_CLIENT_ID}
   client_secret: ${AUTH0_CLIENT_ID}
+sendgrid-api-key: ${SENDGRID_API_KEY}
