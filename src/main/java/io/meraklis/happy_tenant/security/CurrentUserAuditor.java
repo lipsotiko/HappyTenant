@@ -7,7 +7,7 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CustomAuditor implements AuditorAware<String> {
+public class CurrentUserAuditor implements AuditorAware<String> {
 
     @Autowired
     private HttpServletRequest request;

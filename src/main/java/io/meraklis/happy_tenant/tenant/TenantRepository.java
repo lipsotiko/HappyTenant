@@ -18,4 +18,6 @@ public interface TenantRepository extends MongoRepository<Tenant, String> {
 
     @PreAuthorize("hasPermission(#email, 'READ_BY_EMAIL')")
     List<Tenant> findByCreatedBy(String email);
+
+    List<Tenant> findByEmail(String email);
 }
