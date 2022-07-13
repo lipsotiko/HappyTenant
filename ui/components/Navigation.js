@@ -20,6 +20,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from 'next/router';
 
@@ -168,7 +169,7 @@ const Navigation = ({ children, subtitle, profilePath, menuItems = [], loginRedi
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar enableColorOnDark position="fixed" color="primary" open={open}>
         <Toolbar>
           <IconButton
             color="inherit"
@@ -182,7 +183,7 @@ const Navigation = ({ children, subtitle, profilePath, menuItems = [], loginRedi
           >
             <MenuIcon />
           </IconButton>
-          <Typography component="div" variant="subtitle1" sx={{ flexGrow: 1 }}>
+          <Typography component="div" variant="h6" sx={{ flexGrow: 1 }}>
             {subtitle}
           </Typography>
           <div>

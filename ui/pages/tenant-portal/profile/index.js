@@ -14,20 +14,20 @@ import axios from 'axios';
 const TenantProfile = () => {
   const { user } = useAuth0();
   const { tokenized } = useAuth();
-  const [landlord, setLandlord] = useState()
+  const [tenant, setTenant] = useState()
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(async () => {
     if (!tokenized) return
-    await axios.get('/api/tenants/search/findByCreatedBy', {
+    await axios.get('/api/tenantUsers/search/findByCreatedBy', {
       params: {
         email: user.email
       }
     }).then(({ data }) => {
-      setLandlord(data)
+      setTenant(data)
     }).catch(() => {
-      setLandlord({
+      setTenant({
         email: user.email
       })
     })
@@ -35,10 +35,10 @@ const TenantProfile = () => {
 
   const onSubmit = async data => {
     setSaving(true)
-    if (landlord.id) {
-      await axios.patch(`/api/tenants/${landlord.id}`, data)
+    if (tenant.id) {
+      await axios.patch(`/api/tenantUsers/${tenant.id}`, data)
     } else {
-      await axios.post('/api/tenants', data)
+      await axios.post('/api/tenantUsers', data)
     }
     setSaving(false)
   }
@@ -51,7 +51,7 @@ const TenantProfile = () => {
     return errors[name] !== undefined
   }
 
-  if (!landlord) {
+  if (!tenant) {
     return <></>
   }
 
@@ -71,7 +71,7 @@ const TenantProfile = () => {
               label="Full Name"
               helperText={showHelperText('fullName')}
               error={showError('fullName')  }
-              defaultValue={landlord?.fullName}
+              defaultValue={tenant?.fullName}
               />
           </Grid>
           <Grid item xs={12}>
@@ -81,7 +81,7 @@ const TenantProfile = () => {
               size="small"
               label="Email"
               disabled
-              defaultValue={landlord?.createdBy || user?.email}
+              defaultValue={tenant?.createdBy || user?.email}
             />
           </Grid>
         </Grid>

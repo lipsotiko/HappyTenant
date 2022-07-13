@@ -41,7 +41,7 @@ const Tenants = () => {
       headerName: 'Actions',
       width: 158,
       renderCell: (params) => <>
-        <Link id={`invite${params.row.id}`} className='pointer' onClick={() => handleInvite(params.row.id)}>Invite</Link>
+        <Link id={`invite${params.row.id}`} className='pointer' onClick={() => handleInvite(params.row.id)}>Resend invite</Link>
       </>
     }
   ]
@@ -68,7 +68,7 @@ const Tenants = () => {
   }
 
   const handleInvite = (tenantId) => {
-    console.log('Invite tenant: ', tenantId)
+    axios.post(`/api/tenants/resend-invitation/${tenantId}`)
   }
 
   return <>
