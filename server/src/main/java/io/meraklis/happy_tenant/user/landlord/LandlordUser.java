@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Landlord extends AbstractAuditor implements Serializable {
+public class LandlordUser extends AbstractAuditor implements Serializable {
 
     private String fullName;
     private String organization;

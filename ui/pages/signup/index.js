@@ -7,7 +7,7 @@ import Container from '@mui/material/Container';
 import { useForm } from 'react-hook-form';
 import LoginButton from 'components/LoginButton'
 import axios from 'axios';
-
+import { getLayout } from 'components/layouts/LandlordSignupLayout'
 
 const SignUp = () => {
   const [saving, setSaving] = useState(false);
@@ -16,7 +16,7 @@ const SignUp = () => {
 
   const onSubmit = async data => {
     setSaving(true)
-    await axios.post('/api/sign-up/owner', data)
+    await axios.post('/api/sign-up/landlord', data)
     setShowSuccess(true)
   };
 
@@ -131,5 +131,7 @@ const SignUp = () => {
     </Container>
   </>
 }
+
+SignUp.getLayout = getLayout
 
 export default SignUp

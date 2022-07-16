@@ -20,7 +20,7 @@ const Profile = () => {
 
   useEffect(async () => {
     if (!tokenized) return
-    await axios.get('/api/landlords/search/findByCreatedBy', {
+    await axios.get('/api/landlordUsers/search/findByCreatedBy', {
       params: {
         email: user.email
       }
@@ -36,9 +36,9 @@ const Profile = () => {
   const onSubmit = async data => {
     setSaving(true)
     if (landlord.id) {
-      await axios.patch(`/api/landlords/${landlord.id}`, data)
+      await axios.patch(`/api/landlordUsers/${landlord.id}`, data)
     } else {
-      await axios.post('/api/landlords', data)
+      await axios.post('/api/landlordUsers', data)
     }
     setSaving(false)
   }

@@ -1,4 +1,4 @@
-package io.meraklis.happy_tenant.user.landlord;
+package io.meraklis.happy_tenant.user.tenant;
 
 import io.meraklis.happy_tenant.security.SecurityService;
 import java.util.Map;
@@ -9,23 +9,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/sign-up/landlord")
-public class LandlordSignUpController {
+@RequestMapping("/api/sign-up/tenant")
+public class TenantSignUpController {
 
     @Autowired
     private SecurityService securityService;
 
     @Autowired
-    private LandlordUserRepository landlordUserRepository;
+    private TenantUserRepository tenantUserRepository;
 
     @PostMapping
     public void createUser(@RequestBody Map<String, String> request) {
         securityService.createUser(request);
-        LandlordUser landlordUser = new LandlordUser();
-        landlordUser.setOrganization(request.get("organization"));
-        landlordUser.setFullName(request.get("fullName"));
-        landlordUser.setCreatedBy(request.get("email"));
-        landlordUserRepository.save(landlordUser);
+        TenantUser tenantUser = new TenantUser();
+        tenantUser.setFullName(request.get("fullName"));
+        tenantUser.setCreatedBy(request.get("email"));
+        tenantUserRepository.save(tenantUser);
     }
 
 }

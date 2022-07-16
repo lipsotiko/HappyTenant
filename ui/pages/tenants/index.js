@@ -9,12 +9,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { getLayout } from 'components/layouts/LandlordLayout'
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
-import { useAuth0 } from "@auth0/auth0-react";
 import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 
 const Tenants = () => {
-  const { user } = useAuth0();
   const { tokenized } = useAuth();
   const router = useRouter();
   const [tenants, setTenants] = useState([])
@@ -47,11 +45,7 @@ const Tenants = () => {
   ]
 
   const getTenants = async () => {
-    const { data } = await axios.get('/api/tenants/all', {
-      params: {
-        email: user.email
-      }
-    })
+    const { data } = await axios.get('/api/tenants/all')
     setTenants(data)
   }
 

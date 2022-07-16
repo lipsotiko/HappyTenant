@@ -9,8 +9,9 @@ import axios from 'axios';
 const Admin = () => {
   const { tokenized } = useAuth();
   const [landlords, setLandlords] = useState([])
+  const [tenants, setTenants] = useState([])
 
-  const columns = [
+  const landLordColumns = [
     {
       field: 'id',
       headerName: 'ID',
@@ -41,18 +42,51 @@ const Admin = () => {
     }
   ]
 
+  const tenantsColumns = [
+    {
+      field: 'id',
+      headerName: 'ID',
+      width: 222
+    }, {
+      field: 'fullName',
+      headerName: 'Full Name',
+      width: 158
+    }, {
+      field: 'createdBy',
+      headerName: 'Email',
+      width: 244
+    }, {
+      field: 'createdDate',
+      headerName: 'Created',
+      width: 188
+    }, {
+      field: 'actions',
+      headerName: 'Actions',
+      width: 158,
+      renderCell: (params) => <>
+        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
+      </>
+    }
+  ]
+
   const getLandlords = async () => {
-    const { data: { _embedded: { landlords }} } = await axios.get('/api/landlords')
-    setLandlords(landlords)
+    const { data: { _embedded: { landlordUsers }} } = await axios.get('/api/landlordUsers')
+    setLandlords(landlordUsers)
+  }
+
+  const getTenants = async () => {
+    const { data: { _embedded: { tenantUsers }} } = await axios.get('/api/tenantUsers')
+    setTenants(tenantUsers)
   }
 
   useEffect(async () => {
     if (!tokenized) return
     getLandlords()
+    getTenants()
   }, [tokenized])
 
   const handleDelete = async (landlordId) => {
-    await axios.delete(`/api/landlords/${landlordId}`)
+    await axios.delete(`/api/landlordUsers/${landlordId}`)
     getLandlords()
   }
 
@@ -61,7 +95,15 @@ const Admin = () => {
     <Box sx={{ height: 400, width: '100%' }}>
       <DataGrid
         rows={landlords}
-        columns={columns}
+        columns={landLordColumns}
+        disableSelectionOnClick
+      />
+    </Box>
+    <p>Tenants</p>
+    <Box sx={{ height: 400, width: '100%' }}>
+      <DataGrid
+        rows={tenants}
+        columns={tenantsColumns}
         disableSelectionOnClick
       />
     </Box>
