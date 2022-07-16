@@ -6,14 +6,13 @@ import io.meraklis.happy_tenant.property.PropertyRepository;
 import io.meraklis.happy_tenant.security.AbstractAuditor;
 import io.meraklis.happy_tenant.security.CurrentUserAuditor;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,16 +36,18 @@ public class TenantController {
     private EmailService emailService;
 
     @GetMapping("/all")
-    @PreAuthorize("hasPermission(#email, 'READ_BY_EMAIL')")
-    public List<Tenant> findByCreatedBy(@Param("email") String email) {
-        List<Tenant> tenants = tenantRepository.findByCreatedBy(email);
-        List<String> propertyIds = tenants.stream().map(Tenant::getPropertyId).collect(Collectors.toList());
-        Map<String, Property> propertyMap = StreamSupport.stream(
-                        propertyRepository.findAllById(propertyIds).spliterator(),
-                        false)
-                .collect(Collectors.toMap(AbstractAuditor::get_id, p -> p));
-        return tenants.stream().peek(t -> t.setProperty(propertyMap.get(t.getPropertyId())))
-                .collect(Collectors.toList());
+    public List<Tenant> findByCreatedBy() {
+        Optional<String> currentUserEmail = currentUserAuditor.getCurrentAuditor();
+        return currentUserEmail.map(email -> {
+            List<Tenant> tenants = tenantRepository.findByCreatedBy(email);
+            List<String> propertyIds = tenants.stream().map(Tenant::getPropertyId).collect(Collectors.toList());
+            Map<String, Property> propertyMap = StreamSupport.stream(
+                            propertyRepository.findAllById(propertyIds).spliterator(),
+                            false)
+                    .collect(Collectors.toMap(AbstractAuditor::get_id, p -> p));
+            return tenants.stream().peek(t -> t.setProperty(propertyMap.get(t.getPropertyId())))
+                    .collect(Collectors.toList());
+        }).orElse(Collections.emptyList());
     }
 
     @PostMapping("/resend-invitation/{tenantId}")

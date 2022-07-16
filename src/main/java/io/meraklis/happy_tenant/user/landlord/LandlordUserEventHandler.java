@@ -9,15 +9,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Configuration
 @RepositoryEventHandler
-public class LandlordEventHandler {
+public class LandlordUserEventHandler {
 
     @Autowired
     private SecurityService securityService;
 
     @HandleBeforeDelete
     @PreAuthorize("hasPermission(#landlord, 'ADMIN')")
-    public void handleBeforeDelete(Landlord landlord) {
-        securityService.deleteUser(landlord.getCreatedBy());
+    public void handleBeforeDelete(LandlordUser landlordUser) {
+        securityService.deleteUser(landlordUser.getCreatedBy());
     }
 
 }
