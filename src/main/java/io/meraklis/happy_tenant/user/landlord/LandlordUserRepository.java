@@ -10,7 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public interface LandlordUserRepository extends MongoRepository<LandlordUser, String> {
 
     @Override
-    @PreAuthorize("hasRole('ROLE_ANONYMOUS') or hasPermission(#landlord, 'WRITE_BY_ID')")
+    @PreAuthorize("hasRole('ROLE_ANONYMOUS') or hasPermission(#landlordUser, 'WRITE_BY_ID')")
     LandlordUser save(LandlordUser landlordUser);
 
     @PreAuthorize("hasPermission(#email, 'READ_BY_EMAIL')")

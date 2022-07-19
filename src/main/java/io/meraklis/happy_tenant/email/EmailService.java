@@ -25,8 +25,8 @@ public class EmailService {
     @Value("${email.no-reply}")
     private String noReplyEmail;
 
-    @Value("${tenant-portal-login-url}")
-    private String tenantPortalLoginUrl;
+    @Value("${tenant-portal-url}")
+    private String tenantPortalUrl;
 
     @Autowired
     private Handlebars handlebars;
@@ -35,7 +35,7 @@ public class EmailService {
         Template template = handlebars.compile("tenant_invite");
         Map<String, String> params = new HashMap<>();
         params.put("fullName", tenant.getFullName());
-        params.put("tenantPortalLoginUrl", tenantPortalLoginUrl);
+        params.put("tenantPortalLoginUrl", tenantPortalUrl + "/login");
         String appliedTemplate = template.apply(params);
 
         Email from = new Email(noReplyEmail);

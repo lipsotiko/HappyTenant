@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -14,8 +15,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+@Slf4j
 @Service
 public class Auth0SecurityService implements SecurityService {
 
@@ -43,9 +46,14 @@ public class Auth0SecurityService implements SecurityService {
         request.put("connection", connection);
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(request, headers());
-        ResponseEntity<Auth0User> exchange = restTemplate.exchange(api, HttpMethod.POST, requestEntity,
-                Auth0User.class);
-        Auth0User body = exchange.getBody();
+        try {
+            ResponseEntity<Auth0User> exchange = restTemplate.exchange(api, HttpMethod.POST, requestEntity,
+                    Auth0User.class);
+            Auth0User body = exchange.getBody();
+        } catch (HttpClientErrorException e) {
+            log.error("An error occurred while trying to create an Auth0 user account: {}", user.get("email"));
+            throw e;
+        }
     }
 
     @Override

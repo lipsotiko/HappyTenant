@@ -1,5 +1,5 @@
 stripe:
-  private_key: ${STRIPE_PRIVATE_KEY}
+  private-key: ${STRIPE_PRIVATE_KEY}
 spring:
   security:
     oauth2:
@@ -20,4 +20,5 @@ auth0:
 email:
   no-reply: "no-reply@meraklis.io"
   sendgrid-api-key: ${SENDGRID_API_KEY}
-tenant-portal-login-url: "http://localhost:3000/tenant-portal/login"
+landlord-portal-url: "http://localhost:3000/"
+tenant-portal-url: "http://localhost:3000/tenant-portal"
