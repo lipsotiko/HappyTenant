@@ -2,7 +2,6 @@ import Navigation from 'components/Navigation'
 import { Auth0Provider } from "@auth0/auth0-react";
 import GroupsIcon from '@mui/icons-material/Groups';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
-import SettingsIcon from '@mui/icons-material/Settings';
 import { MANAGEMENT_PORTAL_BASE_ROUTE, TENANTS_ROUTE } from 'util/constants'
 
 export const getLayout = page => {
@@ -24,10 +23,6 @@ export const getLayout = page => {
           name: 'Tenants',
           icon: <GroupsIcon />,
           route: TENANTS_ROUTE
-        }, {
-          name: 'Settings',
-          icon: <SettingsIcon />,
-          route: '/settings'
         }
       ]}
       loginRedirect="/login"

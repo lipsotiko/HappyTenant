@@ -1,12 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useAuth0 } from "@auth0/auth0-react";
 import useAuth from 'hooks/useAuth'
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
+import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
+import Alert from '@mui/material/Alert';
 import { getLayout } from 'components/layouts/LandlordLayout'
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
@@ -20,26 +22,18 @@ const Profile = () => {
 
   useEffect(async () => {
     if (!tokenized) return
-    await axios.get('/api/landlordUsers/search/findByCreatedBy', {
+    await axios.get('/api/landlord-user/profile', {
       params: {
-        email: user.email
+        returnPath: '/profile'
       }
     }).then(({ data }) => {
       setLandlord(data)
-    }).catch(() => {
-      setLandlord({
-        email: user.email
-      })
     })
   }, [tokenized])
 
   const onSubmit = async data => {
     setSaving(true)
-    if (landlord.id) {
-      await axios.patch(`/api/landlordUsers/${landlord.id}`, data)
-    } else {
-      await axios.post('/api/landlordUsers', data)
-    }
+    await axios.patch(`/api/landlordUsers/${landlord.id}`, data)
     setSaving(false)
   }
 
@@ -50,6 +44,10 @@ const Profile = () => {
   const showError = (name) => {
     return errors[name] !== undefined
   }
+
+  const landlordMemo = useMemo(() => {
+    return landlord
+  }, [landlord])
 
   if (!landlord) {
     return <></>
@@ -93,8 +91,20 @@ const Profile = () => {
               defaultValue={landlord?.createdBy || user?.email}
             />
           </Grid>
+          <Grid item xs={12}>
+            { !landlord.paymentAccountStatus?.isOnboarded &&
+               <Alert severity="warning">
+                Click <Link className="pointer" href={landlord.paymentAccountStatus?.onboardingUrl}>here</Link> to configure your payout method with Stripe.
+              </Alert>
+            }
+            { landlord.paymentAccountStatus?.isOnboarded &&
+              <Alert severity="info">
+                Click <Link className="pointer" href={landlord.paymentAccountStatus?.loginUrl}>here</Link> to log in to Stripe.
+              </Alert>
+            }
+          </Grid>
         </Grid>
-        </Box>
+      </Box>
       <Box m={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <LoadingButton variant="contained" type="submit" loading={saving}>Save</LoadingButton>
       </Box>

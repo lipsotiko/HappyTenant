@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -11,6 +11,7 @@ import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
+import Alert from '@mui/material/Alert';
 import { getLayout } from 'components/layouts/LandlordLayout'
 import { useRouter } from 'next/router';
 import { useForm, Controller } from 'react-hook-form';
@@ -24,6 +25,7 @@ const Create = () => {
   const { tokenized } = useAuth();
   const router = useRouter();
   const [properties, setProperties] = useState([])
+  const [landlord, setLandlord] = useState()
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, getValues, control, formState: { errors } } = useForm({
     defaultValues: {
@@ -37,13 +39,9 @@ const Create = () => {
     router.push(TENANTS_ROUTE)
   }
 
-  const showHelperText = (name) => {
-    return errors[name]?.message
-  }
+  const showHelperText = (name) => errors[name]?.message
 
-  const showError = (name) => {
-    return errors[name] !== undefined
-  }
+  const showError = (name) => errors[name] !== undefined
 
   useEffect(async () => {
     if (!tokenized) return
@@ -54,6 +52,21 @@ const Create = () => {
     })
     setProperties(properties)
   }, [tokenized])
+
+  useEffect(async () => {
+    if (!tokenized) return
+    await axios.get('/api/landlord-user/profile', {
+      params: {
+        returnPath: '/tenants/create'
+      }
+    }).then(({ data }) => {
+      setLandlord(data)
+    })
+  }, [tokenized])
+
+  const disableInvite = useMemo(() => {
+    return properties.length === 0 || !landlord.paymentAccountStatus?.isOnboarded
+  }, [landlord, properties])
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">
@@ -115,8 +128,18 @@ const Create = () => {
           </Grid>
         </Grid>
       </Box>
+      { landlord?.paymentAccountStatus?.isOnboarded === false &&
+        <Alert severity="warning">
+          Click <Link className="pointer" href={landlord.paymentAccountStatus?.onboardingUrl}>here</Link> to configure your payout method with Stripe before inviting tenants.
+        </Alert>
+      }
+      { properties.length === 0 &&
+        <Alert severity="warning">
+          Click <Link className="pointer" href="/properties/create">here</Link> to add a property before inviting tenants.
+        </Alert>
+      }
       <Box m={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <LoadingButton variant="contained" type="submit" loading={saving}>Save</LoadingButton>
+        <LoadingButton variant="contained" type="submit" loading={saving} disabled={disableInvite}>Invite</LoadingButton>
       </Box>
     </form>
   </>

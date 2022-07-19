@@ -1,23 +1,28 @@
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
+import { getLayout } from 'components/layouts/LandlordSignupLayout'
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
-import { useForm } from 'react-hook-form';
 import LoginButton from 'components/LoginButton'
 import axios from 'axios';
-import { getLayout } from 'components/layouts/LandlordSignupLayout'
 
 const SignUp = () => {
+  const router = useRouter();
   const [saving, setSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const { showSuccess } = router.query
   const { register, handleSubmit, getValues, formState: { errors } } = useForm();
 
   const onSubmit = async data => {
     setSaving(true)
-    await axios.post('/api/sign-up/landlord', data)
-    setShowSuccess(true)
+    const { data: { paymentAccountStatus: { isOnboarded, onboardingUrl } } } =
+      await axios.post('/api/sign-up/landlord', { ...data, returnPath: '/signup?showSuccess=true' })
+    if (!isOnboarded) {
+      router.push(onboardingUrl)
+    }
   };
 
   const showHelperText = (name) => {
@@ -48,7 +53,7 @@ const SignUp = () => {
     return 'Passwords do not match'
   }
 
-  if (showSuccess) {
+  if (showSuccess === 'true') {
     return <Container maxWidth="sm">
       <Box m={2}>
         <Typography variant="h2">Account created!</Typography>
@@ -124,7 +129,7 @@ const SignUp = () => {
             error={showError('verifyPassword')  }
             />
           <Box m={2}>
-            <LoadingButton fullWidth variant="contained" type="submit" loading={saving}>Create</LoadingButton>
+            <LoadingButton fullWidth variant="contained" type="submit" loading={saving}>Continue</LoadingButton>
           </Box>
         </form>
       </Box>

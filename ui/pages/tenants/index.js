@@ -32,7 +32,7 @@ const Tenants = () => {
       headerName: 'Property',
       width: 138,
       valueGetter: (params) => {
-        return params.row.property.address
+        return params.row?.property?.address
       }
     }, {
       field: 'actions',

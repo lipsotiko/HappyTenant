@@ -37,7 +37,7 @@ const Admin = () => {
       headerName: 'Actions',
       width: 158,
       renderCell: (params) => <>
-        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
+        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDeleteLandlord(params.row.id)}>Delete</Link>
       </>
     }
   ]
@@ -64,7 +64,7 @@ const Admin = () => {
       headerName: 'Actions',
       width: 158,
       renderCell: (params) => <>
-        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
+        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDeleteTenant(params.row.id)}>Delete</Link>
       </>
     }
   ]
@@ -85,9 +85,14 @@ const Admin = () => {
     getTenants()
   }, [tokenized])
 
-  const handleDelete = async (landlordId) => {
+  const handleDeleteLandlord = async (landlordId) => {
     await axios.delete(`/api/landlordUsers/${landlordId}`)
     getLandlords()
+  }
+
+  const handleDeleteTenant = async (tenantId) => {
+    await axios.delete(`/api/tenantUsers/${tenantId}`)
+    getTenants()
   }
 
   return <>
