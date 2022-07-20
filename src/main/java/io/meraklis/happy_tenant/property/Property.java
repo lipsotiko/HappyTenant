@@ -15,4 +15,5 @@ public class Property extends AbstractAuditor {
     private String country;
     private Double rent;
     private Double deposit;
+    private PaymentProductMetadata metadata;
 }

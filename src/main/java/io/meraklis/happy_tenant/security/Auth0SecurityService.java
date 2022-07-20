@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -32,8 +31,6 @@ public class Auth0SecurityService implements SecurityService {
     private String connection;
 
     private final RestTemplate restTemplate = new RestTemplate();
-    @Autowired
-    private TokenValidatorService tokenValidatorService;
 
     @Override
     public void createUser(Map<String, String> user) {
@@ -101,14 +98,7 @@ public class Auth0SecurityService implements SecurityService {
 
     private HttpHeaders headers() {
         HttpHeaders httpHeaders = new HttpHeaders();
-
-        if (!tokenValidatorService.isValid()) {
-            Auth0Token auth0Token = accessToken();
-            tokenValidatorService.setToken(auth0Token.getAccess_token());
-            tokenValidatorService.setExpires(auth0Token.getExpires_in());
-        }
-
-        httpHeaders.setBearerAuth(tokenValidatorService.getToken());
+        httpHeaders.setBearerAuth(accessToken().getAccess_token());
         return httpHeaders;
     }
 

@@ -1,7 +1,7 @@
 package io.meraklis.happy_tenant.user.landlord;
 
 import io.meraklis.happy_tenant.payment.PaymentAccountStatus;
-import io.meraklis.happy_tenant.payment.StripePaymentService;
+import io.meraklis.happy_tenant.payment.PaymentService;
 import io.meraklis.happy_tenant.security.SecurityService;
 import io.meraklis.happy_tenant.util.EmailValidationService;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class LandlordSignUpController {
     private LandlordUserRepository landlordUserRepository;
 
     @Autowired
-    private StripePaymentService stripePaymentService;
+    private PaymentService paymentService;
 
     @Autowired
     private EmailValidationService emailValidationService;
@@ -37,12 +37,13 @@ public class LandlordSignUpController {
         String email = emailValidationService.cleanAddress(request.get("email"));
         newLandlordUser.setCreatedBy(email);
 
-        String paymentAccountId = stripePaymentService.createAccount(email);
+        String paymentAccountId = paymentService.createAccount(email);
         newLandlordUser.setPaymentAccountId(paymentAccountId);
+        newLandlordUser.setPaymentCustomerId(paymentService.createCustomer(email));
 
         String returnPath = request.get("returnPath");
         LandlordUser saved = landlordUserRepository.save(newLandlordUser);
-        PaymentAccountStatus accountStatus = stripePaymentService.getAccountStatus(paymentAccountId, returnPath);
+        PaymentAccountStatus accountStatus = paymentService.getAccountStatus(paymentAccountId, returnPath);
         saved.setPaymentAccountStatus(accountStatus);
         return saved;
     }

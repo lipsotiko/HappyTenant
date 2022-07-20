@@ -13,6 +13,7 @@ public class Tenant extends AbstractAuditor {
     private String propertyId;
     private String fullName;
     private String email;
+    private TenantMetadata metadata;
 
     @Transient
     private Property property;
