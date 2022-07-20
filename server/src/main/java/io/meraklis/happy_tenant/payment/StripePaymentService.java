@@ -4,7 +4,17 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Account;
 import com.stripe.model.AccountLink;
+import com.stripe.model.Customer;
 import com.stripe.model.LoginLink;
+import com.stripe.model.Price;
+import com.stripe.model.Product;
+import com.stripe.model.Subscription;
+import com.stripe.net.RequestOptions;
+import com.stripe.param.PriceCreateParams;
+import com.stripe.param.PriceCreateParams.Recurring;
+import com.stripe.param.PriceCreateParams.Recurring.Interval;
+import com.stripe.param.SubscriptionCreateParams;
+import com.stripe.param.SubscriptionCreateParams.PaymentSettings.PaymentMethodType;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +55,135 @@ public class StripePaymentService implements PaymentService {
     }
 
     @Override
+    public String createProduct(String description) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", description);
+        try {
+            return Product.create(params).getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createProduct(String description, String accountId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("name", description);
+        try {
+            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+            return Product.create(params, requestOptions).getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deactivateProduct(String productId) {
+        if (productId == null) {
+            return;
+        }
+        try {
+            Product product = Product.retrieve(productId);
+            Map<String, Object> params = new HashMap<>();
+            params.put("active", false);
+            product.update(params);
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deactivateProduct(String productId, String accountId) {
+        if (productId == null) {
+            return;
+        }
+        try {
+            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+            Product product = Product.retrieve(productId, requestOptions);
+            Map<String, Object> params = new HashMap<>();
+            params.put("active", false);
+            product.update(params, requestOptions);
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createPrice(Double price, String productId) {
+        try {
+            return Price.create(priceCreateParams(price, productId)).getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createPrice(Double price, String productId, String accountId) {
+        try {
+            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+            return Price.create(priceCreateParams(price, productId), requestOptions).getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private PriceCreateParams priceCreateParams(Double price, String productId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("unit_amount", (int) Math.ceil(price * 100));
+        params.put("currency", "usd");
+        params.put("product", productId);
+
+        return PriceCreateParams.builder().putAllExtraParam(params)
+                .setRecurring(Recurring.builder().setInterval(Interval.MONTH).build()).build();
+    }
+
+    @Override
+    public void deactivatePrice(String priceId) {
+        if (priceId == null) {
+            return;
+        }
+        try {
+            Price price = Price.retrieve(priceId);
+            Map<String, Object> params = new HashMap<>();
+            params.put("active", false);
+            price.update(params);
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deactivatePrice(String priceId, String accountId) {
+        RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+
+    }
+
+    @Override
+    public void deleteCustomer(String paymentCustomerId) {
+        if (paymentCustomerId == null) {
+            return;
+        }
+        try {
+            Customer.retrieve(paymentCustomerId).delete();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void deleteCustomer(String paymentCustomerId, String accountId) {
+        if (paymentCustomerId == null) {
+            return;
+        }
+        try {
+            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+            Customer.retrieve(paymentCustomerId, requestOptions).delete();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public void deleteAccount(String accountId) {
         if (accountId == null) {
             return;
@@ -72,6 +211,88 @@ public class StripePaymentService implements PaymentService {
                     .loginUrl((isOnboarded) ? createLoginLink(account.getId()) : null)
                     .onboardingUrl((!isOnboarded) ? createOnBoardingLink(account.getId(), returnPath) : null)
                     .build();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createSubscription(String customerId, String priceId) {
+        SubscriptionCreateParams subCreateParams = SubscriptionCreateParams.builder()
+                .setCustomer(customerId)
+                .addItem(
+                        SubscriptionCreateParams
+                                .Item.builder()
+                                .setPrice(priceId)
+                                .build()
+                )
+                .setPaymentBehavior(
+                        SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE
+                )
+                .setPaymentSettings(
+                        SubscriptionCreateParams.PaymentSettings.builder()
+                                .addPaymentMethodType(PaymentMethodType.US_BANK_ACCOUNT)
+                                .build()
+                )
+                .build();
+
+        try {
+            return Subscription.create(subCreateParams).getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createSubscription(String customerId, String priceId, String accountId) {
+        SubscriptionCreateParams subCreateParams = SubscriptionCreateParams.builder()
+                .setCustomer(customerId)
+                .addItem(
+                        SubscriptionCreateParams
+                                .Item.builder()
+                                .setPrice(priceId)
+                                .build()
+                )
+                .setPaymentBehavior(
+                        SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE
+                )
+                .setPaymentSettings(
+                        SubscriptionCreateParams.PaymentSettings.builder()
+                                .addPaymentMethodType(PaymentMethodType.US_BANK_ACCOUNT)
+                                .build()
+                )
+                .build();
+
+        try {
+            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+            return Subscription.create(subCreateParams, requestOptions).getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createCustomer(String email) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("email", email);
+
+        try {
+            Customer customer = Customer.create(params);
+            return customer.getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createCustomer(String email, String accountId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("email", email);
+
+        try {
+            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+            Customer customer = Customer.create(params, requestOptions);
+            return customer.getId();
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }

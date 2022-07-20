@@ -118,6 +118,7 @@ const CreateProperty = () => {
               {...register('rent', {
                 required: 'Rent is a required field.',
               })}
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', step: '0.01' }}
               fullWidth
               required
               type="number"
@@ -129,19 +130,20 @@ const CreateProperty = () => {
               />
             </Grid>
           <Grid item xs={6}>
-              <TextField
-                {...register('deposit', {
-                  required: 'Deposit is a required field.',
-                })}
-                fullWidth
-                required
-                type="number"
-                margin="normal"
-                size="small"
-                label="Deposit ($)"
-                helperText={showHelperText('deposit')}
-                error={showError('deposit')  }
-                />
+            <TextField
+              {...register('deposit', {
+                required: 'Deposit is a required field.',
+              })}
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', step: '0.01' }}
+              fullWidth
+              required
+              type="number"
+              margin="normal"
+              size="small"
+              label="Deposit ($)"
+              helperText={showHelperText('deposit')}
+              error={showError('deposit')  }
+              />
             </Grid>
           </Grid>
         </Box>

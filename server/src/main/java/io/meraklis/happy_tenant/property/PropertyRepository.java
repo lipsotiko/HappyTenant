@@ -12,10 +12,6 @@ public interface PropertyRepository extends MongoRepository<Property, String> {
     @PreAuthorize("hasPermission(#property, 'WRITE_BY_ID')")
     Property save(Property property);
 
-    @Override
-    @PreAuthorize("hasPermission(#id, 'property', 'DELETE_BY_ID')")
-    void deleteById(String id);
-
     @PreAuthorize("hasPermission(#email, 'READ_BY_EMAIL')")
     List<Property> findByCreatedBy(String email);
 }

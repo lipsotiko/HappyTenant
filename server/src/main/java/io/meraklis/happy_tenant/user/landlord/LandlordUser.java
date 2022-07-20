@@ -18,6 +18,7 @@ public class LandlordUser extends AbstractAuditor implements Serializable {
     private String fullName;
     private String organization;
     private String paymentAccountId;
+    private String paymentCustomerId;
 
     @Transient
     private PaymentAccountStatus paymentAccountStatus;

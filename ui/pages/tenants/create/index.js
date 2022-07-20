@@ -24,7 +24,7 @@ const Create = () => {
   const { user } = useAuth0();
   const { tokenized } = useAuth();
   const router = useRouter();
-  const [properties, setProperties] = useState([])
+  const [properties, setProperties] = useState()
   const [landlord, setLandlord] = useState()
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, getValues, control, formState: { errors } } = useForm({
@@ -65,8 +65,12 @@ const Create = () => {
   }, [tokenized])
 
   const disableInvite = useMemo(() => {
-    return properties.length === 0 || !landlord.paymentAccountStatus?.isOnboarded
+    return properties === undefined || properties.length === 0 || landlord === undefined || landlord.paymentAccountStatus?.isOnboarded === false
   }, [landlord, properties])
+
+  if (!landlord || !properties) {
+    return <></>
+  }
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">
@@ -90,6 +94,7 @@ const Create = () => {
                       {...register('propertyId', { required: 'Property is a required field.' })}
                       id="property-select"
                       label="Property"
+                      disabled={properties.length === 0}
                       value={getValues('propertyId')}
                       error={showError('propertyId')  }
                     >

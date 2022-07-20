@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { getLayout } from 'components/layouts/LandlordLayout'
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
@@ -54,12 +53,6 @@ const Tenants = () => {
     getTenants()
   }, [tokenized])
 
-  const handleDelete = async () => {
-    console.log(selectedTenantIds)
-    await Promise.all(
-      selectedTenantIds.map((tenantId) => axios.delete(`/api/tenants/${tenantId}`)))
-    getTenants()
-  }
 
   const handleInvite = (tenantId) => {
     axios.post(`/api/tenants/resend-invitation/${tenantId}`)
@@ -80,11 +73,6 @@ const Tenants = () => {
         disableSelectionOnClick
         onSelectionModelChange={setSelectedTenantIds}
       />
-    </Box>
-    <Box sx={{ display: 'flex', justifyContent: 'center', margin: '12px'}}>
-      <Button variant="outlined" color="error" startIcon={<DeleteIcon />} disabled={selectedTenantIds.length === 0} onClick={handleDelete}>
-        Delete
-      </Button>
     </Box>
   </>
 }

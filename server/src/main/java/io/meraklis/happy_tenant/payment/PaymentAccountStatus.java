@@ -14,4 +14,5 @@ public class PaymentAccountStatus {
     private Boolean isOnboarded;
     private String onboardingUrl;
     private String loginUrl;
+    private String customerId;
 }

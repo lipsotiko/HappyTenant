@@ -43,13 +43,6 @@ const Properties = () => {
       field: 'deposit',
       headerName: 'Deposit ($)',
       width: 100
-    }, {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 158,
-      renderCell: (params) => <>
-        <Link id={`delete_${params.row.id}`} className='pointer' onClick={() => handleDelete(params.row.id)}>Delete</Link>
-      </>
     }
   ]
 
@@ -66,11 +59,6 @@ const Properties = () => {
     if (!tokenized) return
     getProperties()
   }, [tokenized])
-
-  const handleDelete = async (propertyId) => {
-    await axios.delete(`/api/properties/${propertyId}`)
-    getProperties()
-  }
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">
