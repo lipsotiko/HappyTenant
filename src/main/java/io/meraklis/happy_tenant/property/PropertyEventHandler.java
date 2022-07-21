@@ -30,7 +30,7 @@ public class PropertyEventHandler {
             landlordUser.ifPresent(landlord -> {
                 String accountId = landlord.getPaymentAccountId();
                 String productId = paymentService.createProduct(property.getAddress(), accountId);
-                String priceId = paymentService.createPrice(property.getRent(), productId, accountId);
+                String priceId = paymentService.createPrice(property.getRent(), productId, accountId, true);
                 PaymentProductMetadata metadata =
                         PaymentProductMetadata.builder().accountId(accountId).productId(productId).priceId(priceId)
                                 .build();
