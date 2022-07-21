@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import { getLayout } from 'components/layouts/LandlordLayout'
 import { useRouter } from 'next/router';
 import { useAuth0 } from "@auth0/auth0-react";
@@ -37,12 +36,8 @@ const Properties = () => {
       width: 148
     }, {
       field: 'rent',
-      headerName: 'Rent ($)',
-      width: 100
-    }, {
-      field: 'deposit',
-      headerName: 'Deposit ($)',
-      width: 100
+      headerName: 'Monthly Rent ($)',
+      width: 120
     }
   ]
 

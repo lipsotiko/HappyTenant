@@ -25,7 +25,7 @@ const Tenants = () => {
     }, {
       field: 'email',
       headerName: 'Email',
-      width: 200
+      width: 244
     }, {
       field: 'property',
       headerName: 'Property',
@@ -36,7 +36,7 @@ const Tenants = () => {
     }, {
       field: 'actions',
       headerName: 'Actions',
-      width: 158,
+      width: 120,
       renderCell: (params) => <>
         <Link id={`invite${params.row.id}`} className='pointer' onClick={() => handleInvite(params.row.id)}>Resend invite</Link>
       </>

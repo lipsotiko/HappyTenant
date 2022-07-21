@@ -1,5 +1,7 @@
 package io.meraklis.happy_tenant.payment;
 
+import java.time.LocalDate;
+
 public interface PaymentService {
 
     String createAccount(String email);
@@ -18,7 +20,7 @@ public interface PaymentService {
 
     String createPrice(Double price, String productId);
 
-    String createPrice(Double price, String productId, String accountId);
+    String createPrice(Double price, String productId, String accountId, Boolean recurringMonthly);
 
 
     void deactivatePrice(String priceId);
@@ -42,4 +44,7 @@ public interface PaymentService {
 
     String createSubscription(String customerId, String priceId, String accountId);
 
+    void createInvoice(String description, LocalDate dueDate, String customerId, String accountId);
+
+    String createInvoiceItem(String priceId, String customerId, String accountId);
 }

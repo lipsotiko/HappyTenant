@@ -113,7 +113,7 @@ const CreateProperty = () => {
       <Divider />
       <Box m={2}>
         <Grid container spacing={2}>
-          <Grid item xs={6}>
+          <Grid item xs={12}>
             <TextField
               {...register('rent', {
                 required: 'Rent is a required field.',
@@ -127,22 +127,6 @@ const CreateProperty = () => {
               label="Rent ($)"
               helperText={showHelperText('rent')}
               error={showError('rent')  }
-              />
-            </Grid>
-          <Grid item xs={6}>
-            <TextField
-              {...register('deposit', {
-                required: 'Deposit is a required field.',
-              })}
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', step: '0.01' }}
-              fullWidth
-              required
-              type="number"
-              margin="normal"
-              size="small"
-              label="Deposit ($)"
-              helperText={showHelperText('deposit')}
-              error={showError('deposit')  }
               />
             </Grid>
           </Grid>

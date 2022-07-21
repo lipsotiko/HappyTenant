@@ -5,16 +5,23 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Account;
 import com.stripe.model.AccountLink;
 import com.stripe.model.Customer;
+import com.stripe.model.Invoice;
+import com.stripe.model.InvoiceItem;
 import com.stripe.model.LoginLink;
 import com.stripe.model.Price;
 import com.stripe.model.Product;
 import com.stripe.model.Subscription;
 import com.stripe.net.RequestOptions;
+import com.stripe.param.InvoiceCreateParams;
+import com.stripe.param.InvoiceCreateParams.CollectionMethod;
+import com.stripe.param.InvoiceItemCreateParams;
 import com.stripe.param.PriceCreateParams;
 import com.stripe.param.PriceCreateParams.Recurring;
 import com.stripe.param.PriceCreateParams.Recurring.Interval;
 import com.stripe.param.SubscriptionCreateParams;
 import com.stripe.param.SubscriptionCreateParams.PaymentSettings.PaymentMethodType;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -111,30 +118,34 @@ public class StripePaymentService implements PaymentService {
     @Override
     public String createPrice(Double price, String productId) {
         try {
-            return Price.create(priceCreateParams(price, productId)).getId();
+            return Price.create(priceCreateParams(price, productId, true)).getId();
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public String createPrice(Double price, String productId, String accountId) {
+    public String createPrice(Double price, String productId, String accountId, Boolean recurringMonthly) {
         try {
             RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
-            return Price.create(priceCreateParams(price, productId), requestOptions).getId();
+            return Price.create(priceCreateParams(price, productId, recurringMonthly), requestOptions).getId();
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private PriceCreateParams priceCreateParams(Double price, String productId) {
+    private PriceCreateParams priceCreateParams(Double price, String productId, Boolean recurringMonthly) {
         Map<String, Object> params = new HashMap<>();
         params.put("unit_amount", (int) Math.ceil(price * 100));
         params.put("currency", "usd");
         params.put("product", productId);
 
-        return PriceCreateParams.builder().putAllExtraParam(params)
-                .setRecurring(Recurring.builder().setInterval(Interval.MONTH).build()).build();
+        if (recurringMonthly) {
+            return PriceCreateParams.builder().putAllExtraParam(params)
+                    .setRecurring(Recurring.builder().setInterval(Interval.MONTH).build()).build();
+        }
+
+        return PriceCreateParams.builder().putAllExtraParam(params).build();
     }
 
     @Override
@@ -155,7 +166,6 @@ public class StripePaymentService implements PaymentService {
     @Override
     public void deactivatePrice(String priceId, String accountId) {
         RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
-
     }
 
     @Override
@@ -266,6 +276,34 @@ public class StripePaymentService implements PaymentService {
         try {
             RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
             return Subscription.create(subCreateParams, requestOptions).getId();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void createInvoice(String description, LocalDate dueDate, String customerId, String accountId) {
+        RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+        try {
+            InvoiceCreateParams createParams = InvoiceCreateParams
+                    .builder()
+                    .setCustomer(customerId)
+                    .setDescription(description)
+                    .setCollectionMethod(CollectionMethod.SEND_INVOICE)
+                    .setDueDate(dueDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC))
+                    .build();
+            Invoice.create(createParams, requestOptions);
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public String createInvoiceItem(String priceId, String customerId, String accountId) {
+        RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+        InvoiceItemCreateParams createParams = InvoiceItemCreateParams.builder().setCustomer(customerId)
+                .setPrice(priceId).build();
+        try {
+            return InvoiceItem.create(createParams, requestOptions).getId();
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }

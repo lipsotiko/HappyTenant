@@ -8,6 +8,8 @@ import io.meraklis.happy_tenant.user.landlord.LandlordUser;
 import io.meraklis.happy_tenant.user.landlord.LandlordUserRepository;
 import io.meraklis.happy_tenant.util.EmailValidationService;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -47,14 +49,50 @@ public class TenantEventHandler {
                 String accountId = landlord.getPaymentAccountId();
                 String customerId = paymentService.createCustomer(cleanEmail, accountId);
                 propertyRepository.findById(tenant.getPropertyId()).ifPresent(property -> {
-                    String priceId = property.getMetadata().getPriceId();
-                    String subscriptionId = paymentService.createSubscription(customerId, priceId, accountId);
-                    TenantMetadata status = TenantMetadata.builder().customerId(customerId)
-                            .subscriptionId(subscriptionId).build();
+                    String rentPriceId = property.getMetadata().getPriceId();
+
+                    TenantMetadata status = TenantMetadata.builder().customerId(customerId).build();
+                    if (tenant.getCreateMonthlySubscription()) {
+                        String subscriptionId = paymentService.createSubscription(customerId, rentPriceId, accountId);
+                        status.setSubscriptionId(subscriptionId);
+                    }
                     tenant.setMetadata(status);
+
+                    List<String> initialInvoice = new ArrayList<>();
+                    if (tenant.getAddLastMonthsRentToInvoice()) {
+                        String lastMonthsRentPriceId = createPriceForProduct(
+                                "Last months rent",
+                                property.getRent(),
+                                accountId);
+                        initialInvoice.add(lastMonthsRentPriceId);
+                    }
+
+                    if (tenant.getAddSecurityDepositToInvoice()) {
+                        String securityDepositPriceId = createPriceForProduct(
+                                "Security deposit",
+                                tenant.getSecurityDeposit(),
+                                accountId);
+                        initialInvoice.add(securityDepositPriceId);
+                    }
+
+                    if (initialInvoice.size() > 0) {
+                        String invoiceDescription = property.getAddress() + " - Deposit";
+                        initialInvoice.forEach(
+                                priceId -> paymentService.createInvoiceItem(priceId, customerId, accountId));
+                        paymentService.createInvoice(
+                                invoiceDescription,
+                                tenant.getMoveInDate(),
+                                customerId,
+                                accountId);
+                    }
                 });
             });
         });
+    }
+
+    private String createPriceForProduct(String name, Double price, String accountId) {
+        String securityDepositProductId = paymentService.createProduct(name, accountId);
+        return paymentService.createPrice(price, securityDepositProductId, accountId, false);
     }
 
     @HandleAfterCreate
