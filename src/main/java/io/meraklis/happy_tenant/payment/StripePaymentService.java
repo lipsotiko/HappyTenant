@@ -12,6 +12,13 @@ import com.stripe.model.Price;
 import com.stripe.model.Product;
 import com.stripe.model.Subscription;
 import com.stripe.net.RequestOptions;
+import com.stripe.param.AccountCreateParams;
+import com.stripe.param.AccountCreateParams.BusinessProfile;
+import com.stripe.param.AccountCreateParams.Capabilities;
+import com.stripe.param.AccountCreateParams.Capabilities.CardPayments;
+import com.stripe.param.AccountCreateParams.Capabilities.Transfers;
+import com.stripe.param.AccountCreateParams.Capabilities.UsBankAccountAchPayments;
+import com.stripe.param.AccountCreateParams.Type;
 import com.stripe.param.InvoiceCreateParams;
 import com.stripe.param.InvoiceCreateParams.CollectionMethod;
 import com.stripe.param.InvoiceItemCreateParams;
@@ -20,6 +27,7 @@ import com.stripe.param.PriceCreateParams.Recurring;
 import com.stripe.param.PriceCreateParams.Recurring.Interval;
 import com.stripe.param.SubscriptionCreateParams;
 import com.stripe.param.SubscriptionCreateParams.PaymentSettings.PaymentMethodType;
+import com.stripe.param.SubscriptionCreateParams.ProrationBehavior;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Collections;
@@ -46,12 +54,24 @@ public class StripePaymentService implements PaymentService {
         Stripe.apiKey = apiKey;
     }
 
+    /**
+     * https://stripe.com/docs/connect/setting-mcc#list real_estate_agents_and_managers_rentals 6513
+     */
+
     public String createAccount(String email) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("type", "express");
-        params.put("country", "US");
-        params.put("email", email);
-        params.put("capabilities", buildCapabilities());
+        AccountCreateParams params = AccountCreateParams
+                .builder()
+                .setCountry("US")
+                .setType(Type.EXPRESS)
+                .setEmail(email)
+                .setCapabilities(Capabilities.builder()
+                        .setCardPayments(CardPayments.builder().setRequested(true).build())
+                        .setTransfers(Transfers.builder().setRequested(true).build())
+                        .setUsBankAccountAchPayments(UsBankAccountAchPayments.builder().setRequested(true).build())
+                        .build())
+                .setBusinessProfile(
+                        BusinessProfile.builder().setProductDescription("Property management").setMcc("6513").build()
+                ).build();
         Account account;
         try {
             account = Account.create(params);
@@ -62,63 +82,12 @@ public class StripePaymentService implements PaymentService {
     }
 
     @Override
-    public String createProduct(String description) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("name", description);
-        try {
-            return Product.create(params).getId();
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
     public String createProduct(String description, String accountId) {
         Map<String, Object> params = new HashMap<>();
         params.put("name", description);
         try {
             RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
             return Product.create(params, requestOptions).getId();
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void deactivateProduct(String productId) {
-        if (productId == null) {
-            return;
-        }
-        try {
-            Product product = Product.retrieve(productId);
-            Map<String, Object> params = new HashMap<>();
-            params.put("active", false);
-            product.update(params);
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void deactivateProduct(String productId, String accountId) {
-        if (productId == null) {
-            return;
-        }
-        try {
-            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
-            Product product = Product.retrieve(productId, requestOptions);
-            Map<String, Object> params = new HashMap<>();
-            params.put("active", false);
-            product.update(params, requestOptions);
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public String createPrice(Double price, String productId) {
-        try {
-            return Price.create(priceCreateParams(price, productId, true)).getId();
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
@@ -146,64 +115,6 @@ public class StripePaymentService implements PaymentService {
         }
 
         return PriceCreateParams.builder().putAllExtraParam(params).build();
-    }
-
-    @Override
-    public void deactivatePrice(String priceId) {
-        if (priceId == null) {
-            return;
-        }
-        try {
-            Price price = Price.retrieve(priceId);
-            Map<String, Object> params = new HashMap<>();
-            params.put("active", false);
-            price.update(params);
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void deactivatePrice(String priceId, String accountId) {
-        RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
-    }
-
-    @Override
-    public void deleteCustomer(String paymentCustomerId) {
-        if (paymentCustomerId == null) {
-            return;
-        }
-        try {
-            Customer.retrieve(paymentCustomerId).delete();
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void deleteCustomer(String paymentCustomerId, String accountId) {
-        if (paymentCustomerId == null) {
-            return;
-        }
-        try {
-            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
-            Customer.retrieve(paymentCustomerId, requestOptions).delete();
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void deleteAccount(String accountId) {
-        if (accountId == null) {
-            return;
-        }
-        try {
-            Account account = Account.retrieve(accountId);
-            account.delete();
-        } catch (StripeException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -254,7 +165,7 @@ public class StripePaymentService implements PaymentService {
     }
 
     @Override
-    public String createSubscription(String customerId, String priceId, String accountId) {
+    public void createSubscription(String customerId, String priceId, LocalDate billingCycleAnchor, String accountId) {
         SubscriptionCreateParams subCreateParams = SubscriptionCreateParams.builder()
                 .setCustomer(customerId)
                 .addItem(
@@ -263,6 +174,10 @@ public class StripePaymentService implements PaymentService {
                                 .setPrice(priceId)
                                 .build()
                 )
+                .setDaysUntilDue(30L)
+                .setProrationBehavior(ProrationBehavior.NONE)
+                .setCollectionMethod(SubscriptionCreateParams.CollectionMethod.SEND_INVOICE)
+                .setBillingCycleAnchor(billingCycleAnchor.atStartOfDay().toEpochSecond(ZoneOffset.UTC))
                 .setPaymentBehavior(
                         SubscriptionCreateParams.PaymentBehavior.DEFAULT_INCOMPLETE
                 )
@@ -275,7 +190,7 @@ public class StripePaymentService implements PaymentService {
 
         try {
             RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
-            return Subscription.create(subCreateParams, requestOptions).getId();
+            Subscription.create(subCreateParams, requestOptions);
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
@@ -298,12 +213,14 @@ public class StripePaymentService implements PaymentService {
     }
 
     @Override
-    public String createInvoiceItem(String priceId, String customerId, String accountId) {
+    public void createInvoiceItem(String productName, Double securityDeposit, String customerId, String accountId) {
         RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+        String productId = createProduct(productName, accountId);
+        String priceId = createPrice(securityDeposit, productId, accountId, false);
         InvoiceItemCreateParams createParams = InvoiceItemCreateParams.builder().setCustomer(customerId)
                 .setPrice(priceId).build();
         try {
-            return InvoiceItem.create(createParams, requestOptions).getId();
+            InvoiceItem.create(createParams, requestOptions);
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
@@ -365,20 +282,6 @@ public class StripePaymentService implements PaymentService {
         } catch (StripeException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Map<String, Object> buildCapabilities() {
-        Map<String, Object> capabilities = new HashMap<>();
-        capabilities.put("card_payments", requestCapability());
-        capabilities.put("transfers", requestCapability());
-        capabilities.put("us_bank_account_ach_payments", requestCapability());
-        return capabilities;
-    }
-
-    private Map<String, Object> requestCapability() {
-        Map<String, Object> params = new HashMap<>();
-        params.put("requested", true);
-        return params;
     }
 
 }

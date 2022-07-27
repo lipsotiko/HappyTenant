@@ -1,8 +1,5 @@
 package io.meraklis.happy_tenant.user.landlord;
 
-import io.meraklis.happy_tenant.payment.PaymentService;
-import io.meraklis.happy_tenant.security.CurrentUserAuditor;
-import io.meraklis.happy_tenant.security.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.annotation.HandleAfterCreate;
@@ -16,31 +13,22 @@ import org.springframework.security.access.prepost.PreAuthorize;
 public class LandlordUserEventHandler {
 
     @Autowired
-    private PaymentService paymentService;
-    @Autowired
-    private SecurityService securityService;
-    @Autowired
-    private CurrentUserAuditor currentUserAuditor;
+    private LandlordUserService landlordUserService;
 
     @HandleBeforeCreate
     public void handleBeforeCreate(LandlordUser landlordUser) {
-        currentUserAuditor.getCurrentAuditor().ifPresent(email -> {
-            String accountId = paymentService.createAccount(email);
-            landlordUser.setPaymentAccountId(accountId);
-        });
+        landlordUserService.createPaymentAccounts(landlordUser);
     }
 
     @HandleAfterCreate
     public void handleAfterCreate(LandlordUser landlordUser) {
-        landlordUser.setPaymentAccountStatus(
-                paymentService.getAccountStatus(landlordUser.getPaymentAccountId(), "/profile"));
+        landlordUserService.setAccountStatus(landlordUser);
     }
 
     @HandleBeforeDelete
     @PreAuthorize("hasPermission(#landlordUser, 'ADMIN')")
     public void handleBeforeDelete(LandlordUser landlordUser) {
-        paymentService.deleteAccount(landlordUser.getPaymentAccountId());
-        securityService.deleteUser(landlordUser.getCreatedBy());
+        landlordUserService.deleteAccount(landlordUser);
     }
 
 }
