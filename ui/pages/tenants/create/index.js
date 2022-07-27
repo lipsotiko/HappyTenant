@@ -13,10 +13,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import Alert from '@mui/material/Alert';
-import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import Divider from '@mui/material/Divider';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DesktopDatePicker } from '@mui/x-date-pickers';
@@ -46,23 +46,28 @@ const Create = () => {
   const [properties, setProperties] = useState()
   const [landlord, setLandlord] = useState()
   const [saving, setSaving] = useState(false);
-  const [moveInDate, setMoveInDate] = useState()
+  const [moveInDate, setMoveInDate] = useState(null)
+  const [billingStartDate, setBillingStartDate] = useState(null)
   const [activeStep, setActiveStep] = useState(0);
 
-  const steps = ['Tenant information', 'Invoicing details'];
+  const steps = ['Tenant information', 'Invoice details', 'Review'];
 
   const { register, handleSubmit, getValues, setValue, clearErrors, trigger, watch, control, formState: { errors } } = useForm({
     defaultValues: {
       propertyId: '',
       createMonthlySubscription: false,
+      addProratedFirstMonthsRent: false,
       addLastMonthsRentToInvoice: false,
       addSecurityDepositToInvoice: false
     }
   });
 
   register('moveInDate', { required: 'Move in date is required', valueAsDate: true })
+  register('billingStartDate', { required: 'Billing start date is required', valueAsDate: true })
+
   const securityDeposit = watch('securityDeposit')
   const createMonthlySubscription = watch('createMonthlySubscription')
+  const addProratedFirstMonthsRent = watch('addProratedFirstMonthsRent')
   const addLastMonthsRentToInvoice = watch('addLastMonthsRentToInvoice')
   const addSecurityDepositToInvoice = watch('addSecurityDepositToInvoice')
 
@@ -72,14 +77,22 @@ const Create = () => {
     setValue('moveInDate', e.toDate())
   }
 
+  const handleBillingStartDateChange = (e) => {
+    if (!e) return
+    setBillingStartDate(e.toDate())
+    setValue('billingStartDate', e.toDate())
+  }
+
   const onSubmit = async data => {
     setSaving(true)
-    await axios.post('/api/tenants', data)
+    await axios.post('/api/tenants', data).catch(() => {
+      setSaving(false)
+      return
+    })
     router.push(TENANTS_ROUTE)
   }
 
   const showHelperText = (name) => errors[name]?.message
-  const showOptionalHelperText = (name, enabledField, message) => getValues(enabledField) && errors[name] ? message : ''
   const showError = (name) => errors[name] !== undefined
 
   useEffect(async () => {
@@ -105,23 +118,18 @@ const Create = () => {
 
   const invoiceMemo = useMemo(() => {
     if (!properties) return []
-    const { address, rent } = properties.find(p => p.id === getValues('propertyId'))
+    const propertyId = getValues('propertyId')
+
+    if (propertyId === '') return []
+    const { address, rent } = properties.find(p => p.id === propertyId)
 
     let items = []
     let total = 0;
 
-    if (addLastMonthsRentToInvoice) {
-      items.push({
-        name:  `${address} - Last months rent`,
-        calories: rent
-      })
-      total += rent
-    }
-
     if (addSecurityDepositToInvoice) {
       items.push({
         name:  `${address} - Security deposit`,
-        calories: securityDeposit
+        calories:  parseFloat(securityDeposit).toFixed(2)
       })
       const parsedSecurityDeposit = parseFloat(securityDeposit)
       if (!isNaN(parsedSecurityDeposit)) {
@@ -129,10 +137,30 @@ const Create = () => {
       }
     }
 
+    if (addProratedFirstMonthsRent) {
+      const moveInDateMoment = moment(moveInDate);
+      const billingStartDateMoment = moment(billingStartDate);
+      const proratedDays = billingStartDateMoment.diff(moveInDateMoment, 'days')
+      const proratedRent = ((rent * 12) / 365) * proratedDays
+      items.push({
+        name:  `${address} - Prorated first months rent`,
+        calories: proratedRent.toFixed(2)
+      })
+      total += proratedRent
+    }
+
+    if (addLastMonthsRentToInvoice) {
+      items.push({
+        name:  `${address} - Last months rent`,
+        calories: parseFloat(rent).toFixed(2)
+      })
+      total += rent
+    }
+
     total = (Math.round((total + Number.EPSILON) * 100) / 100).toFixed(2)
 
     return { items, total };
-  }, [addLastMonthsRentToInvoice, addSecurityDepositToInvoice, securityDeposit])
+  }, [createMonthlySubscription, addProratedFirstMonthsRent, addLastMonthsRentToInvoice, addSecurityDepositToInvoice, securityDeposit])
 
   if (!landlord || !properties) {
     return <></>
@@ -140,14 +168,7 @@ const Create = () => {
 
   const handleNext = async () => {
     if (activeStep === 0) {
-      const valid = await trigger(['propertyId', 'fullName', 'email', 'moveInDate'])
-      if (!valid) {
-        return
-      }
-    }
-
-    if (activeStep === 1) {
-      const valid = await trigger('securityDeposit')
+      const valid = await trigger(['propertyId', 'fullName', 'email', 'moveInDate', 'billingStartDate', 'securityDeposit'])
       if (!valid) {
         return
       }
@@ -184,8 +205,8 @@ const Create = () => {
             <Typography sx={{ mt: 2, mb: 1 }}>Step {activeStep + 1}</Typography>
             { activeStep === 0 &&
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <FormControl fullWidth required margin="normal" size="small">
+                <Grid item xs={12} sm={4}>
+                  <FormControl fullWidth required margin="normal" size="small" error={showError('propertyId')}>
                     <InputLabel htmlFor="property-select">Property</InputLabel>
                     <Controller
                       control={control}
@@ -198,7 +219,6 @@ const Create = () => {
                             label="Property"
                             disabled={properties.length === 0}
                             value={getValues('propertyId')}
-                            error={showError('propertyId')  }
                           >
                             { properties.map(p => {
                               return <MenuItem key={p.id} value={p.id}>{ p.address }</MenuItem>
@@ -209,7 +229,7 @@ const Create = () => {
                     <FormHelperText error>{showHelperText('propertyId')}</FormHelperText>
                   </FormControl>
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <TextField
                     {...register('fullName', { required: 'Full name is a required field.' })}
                     fullWidth
@@ -221,7 +241,7 @@ const Create = () => {
                     error={showError('fullName')  }
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <TextField
                     {...register('email', { required: 'Email is a required field.' })}
                     fullWidth
@@ -233,12 +253,12 @@ const Create = () => {
                     error={showError('email')}
                     />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={4}>
                   <LocalizationProvider dateAdapter={AdapterMoment}>
                     <DesktopDatePicker
                       label="Move in date"
                       value={moveInDate}
-                      shouldDisableDate={(date) => !date.isAfter(moment())}
+                      minDate={moment().add(1, 'days')}
                       renderInput={(params) =>
                         <TextField
                           fullWidth
@@ -248,10 +268,52 @@ const Create = () => {
                           {...params}
                           helperText={showHelperText('moveInDate')}
                           error={showError('moveInDate')}
-                          />}
+                        />}
                       onChange={handleMoveInDateChange}
                     />
                   </LocalizationProvider>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <LocalizationProvider dateAdapter={AdapterMoment}>
+                    <DesktopDatePicker
+                      label="Billing start date"
+                      value={billingStartDate}
+                      minDate={moment().add(1, 'days')}
+                      renderInput={(params) =>
+                        <TextField
+                          fullWidth
+                          required
+                          margin="normal"
+                          size="small"
+                          {...params}
+                          helperText={showHelperText('billingStartDate')}
+                          error={showError('billingStartDate')}
+                        />}
+                      onChange={handleBillingStartDateChange}
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item xs={12} sm={4}>
+                  <TextField
+                    {...register('securityDeposit', {
+                      required: 'Security deposit is a required field',
+                      validate: (e) => {
+                        if (e === '' || e <= 0 ) {
+                          return false
+                        }
+                        return true
+                      }
+                    })}
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', step: '0.01' }}
+                    fullWidth
+                    required
+                    type="number"
+                    margin="normal"
+                    size="small"
+                    label="Security Deposit ($)"
+                    helperText={showHelperText('securityDeposit')}
+                    error={showError('securityDeposit')  }
+                  />
                 </Grid>
               </Grid>
             }
@@ -259,62 +321,74 @@ const Create = () => {
               <Grid container spacing={2}>
                 <Grid item sm={6}>
                   <FormGroup>
-                    <FormControlLabel control={<Checkbox checked={createMonthlySubscription} {...register('createMonthlySubscription')} />} label="Automatically generate monthly invoices to collect rent" />
+                    <FormControlLabel control={<Checkbox checked={createMonthlySubscription} {...register('createMonthlySubscription')} />} label="Generate monthly invoices to collect rent" />
+                    <FormControlLabel control={<Checkbox checked={addProratedFirstMonthsRent} {...register('addProratedFirstMonthsRent')} />} label="Add first months prorated rent to initial invoice" />
                     <FormControlLabel control={<Checkbox checked={addLastMonthsRentToInvoice} {...register('addLastMonthsRentToInvoice')} />} label="Add last months rent to initial invoice" />
                     <FormControlLabel control={<Checkbox checked={addSecurityDepositToInvoice} {...register('addSecurityDepositToInvoice', { onChange: ({target: { checked }})=> {
                       if (!checked) { clearErrors('securityDeposit') }
                       } } ) } />} label="Add security deposit to initial invoice" />
-                    <TextField
-                      {...register('securityDeposit', {
-                        validate: (e) => {
-                          if (getValues('addSecurityDepositToInvoice') && (e === '' || e <= 0 )) {
-                            return false
-                          }
-                          return true
-                        }
-                      })}
-                      inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', step: '0.01' }}
-                      fullWidth
-                      type="number"
-                      margin="normal"
-                      size="small"
-                      label="Security Deposit ($)"
-                      helperText={showOptionalHelperText('securityDeposit', 'addSecurityDepositToInvoice', 'Security deposit is a required field')}
-                      error={showError('securityDeposit')  }
-                    />
                   </FormGroup>
                 </Grid>
-                <Grid item xs={6}>
-                  { (addLastMonthsRentToInvoice || addSecurityDepositToInvoice) &&
-                  <Box>
-                    <TableContainer component={Paper}>
-                      <Table sx={{ minWidth: 650 }} size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell>Items</TableCell>
-                            <TableCell align="right">Amount ($)</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {invoiceMemo.items.map((row) => (
-                            <TableRow
-                              key={row.name}
-                              sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                            >
-                              <TableCell component="th" scope="row">{row.name}</TableCell>
-                              <TableCell align="right">{row.calories}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '8px' }}>
-                      <Typography variant="h6">Total: ${invoiceMemo.total}</Typography>
-                    </Box>
-                  </Box>
-                  }
-                </Grid>
               </Grid>
+            }
+            { activeStep === 2 &&
+              <>
+                <Box justifyContent="center" width={650} margin="0 auto" padding={2}>
+                  <Typography variant="h6">Tenant information</Typography>
+                  <Grid container spacing={1} padding={1} marginBottom={1}>
+                    <Grid item xs={8}><Typography variant="subtitle2">Full name:</Typography></Grid>
+                    <Grid item xs={4}>{getValues('fullName')}</Grid>
+                    <Grid item xs={8}><Typography variant="subtitle2">Email:</Typography></Grid>
+                    <Grid item xs={4}>{getValues('email')}</Grid>
+                    <Grid item xs={8}><Typography variant="subtitle2">Move in date:</Typography></Grid>
+                    <Grid item xs={4}>{moveInDate.toLocaleDateString()}</Grid>
+                    <Grid item xs={8}><Typography variant="subtitle2">Billing start date:</Typography></Grid>
+                    <Grid item xs={4}>{billingStartDate.toLocaleDateString()}</Grid>
+                  </Grid>
+                  <Divider />
+                  <Typography variant="h6" marginTop={1}>Invoice details</Typography>
+                  <Grid container spacing={1} padding={1} marginBottom={1}>
+                    <Grid item xs={8}><Typography variant="subtitle2">Generate monthly invoices to collect rent?</Typography></Grid>
+                    <Grid item xs={4}>{getValues('createMonthlySubscription') ? 'Yes' : 'No'}</Grid>
+                    <Grid item xs={8}><Typography variant="subtitle2">Add first months prorated rent to initial invoice?</Typography></Grid>
+                    <Grid item xs={4}>{getValues('addProratedFirstMonthsRent') ? 'Yes' : 'No'}</Grid>
+                    <Grid item xs={8}><Typography variant="subtitle2">Add last months rent to initial invoice?</Typography></Grid>
+                    <Grid item xs={4}>{getValues('addLastMonthsRentToInvoice') ? 'Yes' : 'No'}</Grid>
+                    <Grid item xs={8}><Typography variant="subtitle2">Add security deposit to initial invoice?</Typography></Grid>
+                    <Grid item xs={4}>{getValues('addSecurityDepositToInvoice') ? 'Yes' : 'No'}</Grid>
+                  </Grid>
+                  <Divider/>
+                  <Typography variant="h6" marginTop={1}>Deposit</Typography>
+                  { (addLastMonthsRentToInvoice || addSecurityDepositToInvoice) &&
+                      <Box margin={2}>
+                        <TableContainer component={Paper}>
+                          <Table size="small">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>Items</TableCell>
+                                <TableCell align="right">Amount ($)</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {invoiceMemo.items.map((row) => (
+                                <TableRow
+                                  key={row.name}
+                                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                >
+                                  <TableCell component="th" scope="row">{row.name}</TableCell>
+                                  <TableCell align="right">{row.calories}</TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '8px' }}>
+                          <Typography variant="h6">Total: ${invoiceMemo.total}</Typography>
+                        </Box>
+                      </Box>
+                    }
+                </Box>
+              </>
             }
             <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
               <Button

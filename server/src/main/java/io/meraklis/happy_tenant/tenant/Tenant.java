@@ -15,12 +15,13 @@ public class Tenant extends AbstractAuditor {
     private String fullName;
     private String email;
     private LocalDate moveInDate;
+    private LocalDate billingStartDate;
     private Boolean createMonthlySubscription;
+    private Boolean addProratedFirstMonthsRent;
     private Boolean addLastMonthsRentToInvoice;
     private Boolean addSecurityDepositToInvoice;
     private Double securityDeposit;
-
-    private TenantMetadata metadata;
+    private String paymentCustomerId;
 
     @Transient
     private Property property;
