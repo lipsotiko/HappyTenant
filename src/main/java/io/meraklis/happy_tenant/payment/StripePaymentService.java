@@ -6,6 +6,7 @@ import com.stripe.model.Account;
 import com.stripe.model.AccountLink;
 import com.stripe.model.Customer;
 import com.stripe.model.Invoice;
+import com.stripe.model.InvoiceCollection;
 import com.stripe.model.InvoiceItem;
 import com.stripe.model.LoginLink;
 import com.stripe.model.Price;
@@ -32,6 +33,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
@@ -203,6 +205,7 @@ public class StripePaymentService implements PaymentService {
                     .builder()
                     .setCustomer(customerId)
                     .setDescription(description)
+                    .setAutoAdvance(true)
                     .setCollectionMethod(CollectionMethod.SEND_INVOICE)
                     .setDueDate(dueDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC))
                     .build();
@@ -227,9 +230,25 @@ public class StripePaymentService implements PaymentService {
     }
 
     @Override
-    public String createCustomer(String email) {
+    public List<Invoice> getCustomerInvoices(String customerId, String accountId) {
+        RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+        Map<String, Object> params = new HashMap<>();
+        params.put("limit", 100);
+        params.put("customer", customerId);
+        InvoiceCollection invoices;
+        try {
+            invoices = Invoice.list(params, requestOptions);
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+        return invoices.getData();
+    }
+
+    @Override
+    public String createCustomer(String email, String name) {
         Map<String, Object> params = new HashMap<>();
         params.put("email", email);
+        params.put("name", name);
 
         try {
             Customer customer = Customer.create(params);
@@ -240,9 +259,10 @@ public class StripePaymentService implements PaymentService {
     }
 
     @Override
-    public String createCustomer(String email, String accountId) {
+    public String createCustomer(String email, String name, String accountId) {
         Map<String, Object> params = new HashMap<>();
         params.put("email", email);
+        params.put("name", name);
 
         try {
             RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();

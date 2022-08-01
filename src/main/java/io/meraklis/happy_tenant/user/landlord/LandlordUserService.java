@@ -27,14 +27,15 @@ public class LandlordUserService {
         securityService.createUser(request);
         LandlordUser newLandlordUser = new LandlordUser();
         newLandlordUser.setOrganization(request.get("organization"));
-        newLandlordUser.setFullName(request.get("fullName"));
+        String fullName = request.get("fullName");
+        newLandlordUser.setFullName(fullName);
 
         String email = emailValidationService.cleanAddress(request.get("email"));
         newLandlordUser.setCreatedBy(email);
 
         String paymentAccountId = paymentService.createAccount(email);
         newLandlordUser.setPaymentAccountId(paymentAccountId);
-        newLandlordUser.setPaymentCustomerId(paymentService.createCustomer(email));
+        newLandlordUser.setPaymentCustomerId(paymentService.createCustomer(email, fullName));
 
         String returnPath = request.get("returnPath");
         LandlordUser saved = landlordUserRepository.save(newLandlordUser);
@@ -45,8 +46,9 @@ public class LandlordUserService {
 
     public void createPaymentAccounts(LandlordUser landlordUser) {
         currentUserAuditor.getCurrentAuditor().ifPresent(email -> {
+            String fullName = landlordUser.getFullName();
             landlordUser.setPaymentAccountId(paymentService.createAccount(email));
-            landlordUser.setPaymentCustomerId(paymentService.createCustomer(email));
+            landlordUser.setPaymentCustomerId(paymentService.createCustomer(email, fullName));
         });
     }
 
