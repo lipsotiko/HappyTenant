@@ -43,7 +43,7 @@ public class TenantEventHandler {
                 String cleanEmail = emailValidationBuilder.cleanAddress(tenant.getEmail());
                 tenant.setEmail(cleanEmail);
                 String accountId = landlord.getPaymentAccountId();
-                String customerId = paymentService.createCustomer(cleanEmail, accountId);
+                String customerId = paymentService.createCustomer(cleanEmail, tenant.getFullName(), accountId);
                 tenant.setPaymentCustomerId(customerId);
 
                 propertyRepository.findById(tenant.getPropertyId()).ifPresent(property -> {

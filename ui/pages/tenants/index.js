@@ -15,13 +15,15 @@ const Tenants = () => {
   const { tokenized } = useAuth();
   const router = useRouter();
   const [tenants, setTenants] = useState([])
-  const [selectedTenantIds, setSelectedTenantIds] = useState([])
 
   const columns = [
     {
       field: 'fullName',
       headerName: 'Full Name',
-      width: 158
+      width: 158,
+      renderCell: (params) => <>
+       <Link id={`invite${params.row.id}`} className='pointer' onClick={() => router.push(`/tenants/${params.row.id}`)}>{params.row.fullName}</Link>
+      </>
     }, {
       field: 'email',
       headerName: 'Email',
@@ -69,9 +71,6 @@ const Tenants = () => {
       <DataGrid
         rows={tenants}
         columns={columns}
-        checkboxSelection
-        disableSelectionOnClick
-        onSelectionModelChange={setSelectedTenantIds}
       />
     </Box>
   </>

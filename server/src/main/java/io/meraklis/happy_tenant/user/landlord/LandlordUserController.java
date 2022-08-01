@@ -29,7 +29,7 @@ public class LandlordUserController {
                 currentUserEmail -> landlordUserRepository.findByCreatedBy(currentUserEmail)
                         .orElseGet(() -> {
                             String accountId = paymentService.createAccount(currentUserEmail);
-                            String customerId = paymentService.createCustomer(currentUserEmail);
+                            String customerId = paymentService.createCustomer(currentUserEmail, null);
                             return landlordUserRepository.save(
                                     LandlordUser.builder().paymentAccountId(accountId).paymentCustomerId(customerId)
                                             .build());

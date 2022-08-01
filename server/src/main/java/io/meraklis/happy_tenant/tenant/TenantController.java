@@ -1,10 +1,14 @@
 package io.meraklis.happy_tenant.tenant;
 
+import com.stripe.model.Invoice;
 import io.meraklis.happy_tenant.email.EmailService;
+import io.meraklis.happy_tenant.payment.PaymentService;
 import io.meraklis.happy_tenant.property.Property;
 import io.meraklis.happy_tenant.property.PropertyRepository;
 import io.meraklis.happy_tenant.security.AbstractAuditor;
 import io.meraklis.happy_tenant.security.CurrentUserAuditor;
+import io.meraklis.happy_tenant.user.landlord.LandlordUser;
+import io.meraklis.happy_tenant.user.landlord.LandlordUserRepository;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +39,12 @@ public class TenantController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private LandlordUserRepository landlordUserRepository;
+
+    @Autowired
+    private PaymentService paymentService;
+
     @GetMapping("/all")
     public List<Tenant> findByCreatedBy() {
         Optional<String> currentUserEmail = currentUserAuditor.getCurrentAuditor();
@@ -48,6 +58,14 @@ public class TenantController {
             return tenants.stream().peek(t -> t.setProperty(propertyMap.get(t.getPropertyId())))
                     .collect(Collectors.toList());
         }).orElse(Collections.emptyList());
+    }
+
+    @GetMapping("/{id}/invoices")
+    public List<Invoice> getInvoices(@PathVariable("id") String tenantId) {
+        return currentUserAuditor.getCurrentAuditor().flatMap(email -> tenantRepository.findById(tenantId)
+                .flatMap(tenant -> landlordUserRepository.findByCreatedBy(email)
+                        .map(landlordUser -> paymentService.getCustomerInvoices(tenant.getPaymentCustomerId(),
+                                landlordUser.getPaymentAccountId())))).orElse(null);
     }
 
     @PostMapping("/resend-invitation/{tenantId}")
