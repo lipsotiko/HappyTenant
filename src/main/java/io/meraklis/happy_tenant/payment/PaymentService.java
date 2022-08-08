@@ -12,6 +12,8 @@ public interface PaymentService {
 
     String createPrice(Double price, String productId, String accountId, Boolean recurringMonthly);
 
+    Long getPrice(String priceId, String accountId);
+
     String createCustomer(String email, String name);
 
     String createCustomer(String email, String name, String accountId);
