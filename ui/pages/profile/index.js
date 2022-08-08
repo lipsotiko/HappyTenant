@@ -15,13 +15,11 @@ import axios from 'axios';
 
 const Profile = () => {
   const { user } = useAuth0();
-  const { tokenized } = useAuth();
   const [landlord, setLandlord] = useState()
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(async () => {
-    if (!tokenized) return
     await axios.get('/api/landlord-user/profile', {
       params: {
         returnPath: '/profile'
@@ -29,7 +27,7 @@ const Profile = () => {
     }).then(({ data }) => {
       setLandlord(data)
     })
-  }, [tokenized])
+  }, [])
 
   const onSubmit = async data => {
     setSaving(true)

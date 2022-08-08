@@ -34,14 +34,12 @@ import { getLayout } from 'components/layouts/LandlordLayout'
 import { useRouter } from 'next/router';
 import { useForm, Controller } from 'react-hook-form';
 import axios from 'axios';
-import useAuth from 'hooks/useAuth'
 import moment from 'moment'
 import { useAuth0 } from "@auth0/auth0-react";
 import { TENANTS_ROUTE } from 'util/constants'
 
 const Create = () => {
   const { user } = useAuth0();
-  const { tokenized } = useAuth();
   const router = useRouter();
   const [properties, setProperties] = useState()
   const [landlord, setLandlord] = useState()
@@ -96,17 +94,15 @@ const Create = () => {
   const showError = (name) => errors[name] !== undefined
 
   useEffect(async () => {
-    if (!tokenized) return
     const { data: { _embedded: { properties }} } = await axios.get('/api/properties/search/findByCreatedBy', {
       params: {
         email: user.email
       }
     })
     setProperties(properties)
-  }, [tokenized])
+  }, [])
 
   useEffect(async () => {
-    if (!tokenized) return
     await axios.get('/api/landlord-user/profile', {
       params: {
         returnPath: '/tenants/create'
@@ -114,7 +110,7 @@ const Create = () => {
     }).then(({ data }) => {
       setLandlord(data)
     })
-  }, [tokenized])
+  }, [])
 
   const invoiceMemo = useMemo(() => {
     if (!properties) return []

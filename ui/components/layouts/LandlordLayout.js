@@ -1,5 +1,6 @@
 import Navigation from 'components/Navigation'
 import { Auth0Provider } from "@auth0/auth0-react";
+import AuthToken from 'components/AuthToken'
 import GroupsIcon from '@mui/icons-material/Groups';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
 import { MANAGEMENT_PORTAL_BASE_ROUTE, TENANTS_ROUTE } from 'util/constants'
@@ -28,7 +29,9 @@ export const getLayout = page => {
       loginRedirect="/login"
       profilePath="/profile"
     >
-      {page}
+      <AuthToken>
+        {page}
+      </AuthToken>
     </Navigation>
   </Auth0Provider>
 }

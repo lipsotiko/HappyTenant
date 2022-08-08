@@ -105,6 +105,16 @@ public class StripePaymentService implements PaymentService {
         }
     }
 
+    @Override
+    public Long getPrice(String priceId, String accountId) {
+        try {
+            RequestOptions requestOptions = RequestOptions.builder().setStripeAccount(accountId).build();
+            return Price.retrieve(priceId, requestOptions).getUnitAmount();
+        } catch (StripeException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private PriceCreateParams priceCreateParams(Double price, String productId, Boolean recurringMonthly) {
         Map<String, Object> params = new HashMap<>();
         params.put("unit_amount", (int) Math.ceil(price * 100));

@@ -8,11 +8,9 @@ import Link from '@mui/material/Link';
 import { getLayout } from 'components/layouts/LandlordLayout'
 import { DataGrid } from '@mui/x-data-grid';
 import { useRouter } from 'next/router';
-import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 
 const Tenants = () => {
-  const { tokenized } = useAuth();
   const router = useRouter();
   const [tenants, setTenants] = useState([])
 
@@ -51,10 +49,8 @@ const Tenants = () => {
   }
 
   useEffect(async () => {
-    if (!tokenized) return
     getTenants()
-  }, [tokenized])
-
+  }, [])
 
   const handleInvite = (tenantId) => {
     axios.post(`/api/tenants/resend-invitation/${tenantId}`)

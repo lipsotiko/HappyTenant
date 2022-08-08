@@ -5,15 +5,14 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
+import Link from '@mui/material/Link';
 import { getLayout } from 'components/layouts/LandlordLayout'
 import { useRouter } from 'next/router';
 import { useAuth0 } from "@auth0/auth0-react";
-import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 
 const Properties = () => {
   const { user } = useAuth0();
-  const { tokenized } = useAuth();
   const router = useRouter();
   const [properties, setProperties] = useState([])
 
@@ -21,7 +20,12 @@ const Properties = () => {
     {
       field: 'address',
       headerName: 'Address',
-      width: 188
+      width: 188,
+      renderCell: (params) => {
+        return <>
+          <Link id={`property_${params.row.id}`} className='pointer' onClick={() => router.push(`/properties/${params.row.id}`)}>{params.row.address}</Link>
+        </>
+      }
     }, {
       field: 'city',
       headerName: 'City',
@@ -51,9 +55,8 @@ const Properties = () => {
   }
 
   useEffect(async () => {
-    if (!tokenized) return
     getProperties()
-  }, [tokenized])
+  }, [])
 
   return <>
     <Breadcrumbs aria-label="breadcrumb">

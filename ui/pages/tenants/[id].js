@@ -5,32 +5,19 @@ import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
+import Grid from '@mui/material/Grid';
 import { DataGrid } from '@mui/x-data-grid';
-import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 import { TENANTS_ROUTE } from 'util/constants'
 import moment from 'moment'
 
 const Tenant = () => {
-  const { tokenized } = useAuth();
   const router = useRouter()
   const { id } = router.query
   const [tenant, setTenant] = useState()
   const [invoices, setInvoices] = useState([])
 
   const columns = [
-    {
-      field: 'description',
-      headerName: 'Description',
-      width: 288,
-      renderCell: (params) => {
-        if (params.row.subscription) {
-          return params.row.lines.data[0].description
-        } else {
-          return params.row.description
-        }
-      }
-    },
     {
       field: 'number',
       headerName: 'Invoice #',
@@ -44,6 +31,17 @@ const Tenant = () => {
         }
       }
     }, {
+      field: 'description',
+      headerName: 'Description',
+      width: 288,
+      renderCell: (params) => {
+        if (params.row.subscription) {
+          return params.row.lines.data[0].description
+        } else {
+          return params.row.description
+        }
+      }
+    }, {
       field: 'status',
       headerName: 'Status',
       renderCell: (params) => {
@@ -52,6 +50,10 @@ const Tenant = () => {
             return 'Pending'
           case 'open':
             return 'Open'
+          case 'paid':
+            return 'Paid'
+          case 'void':
+            return 'Void'
           default:
             return '-'
         }
@@ -110,25 +112,33 @@ const Tenant = () => {
   }
 
   useEffect(async () => {
-    if (!tokenized) return
     getInvoices()
     getTenant()
-  }, [tokenized])
+  }, [])
 
   return <>
    <Breadcrumbs aria-label="breadcrumb">
-      <Typography color="text.primary" class="pointer" onClick={() => router.push(TENANTS_ROUTE)}>Tenants</Typography>
+      <Typography color="text.primary" className="pointer" onClick={() => router.push(TENANTS_ROUTE)}>Tenants</Typography>
       <Typography color="text.primary">
         { tenant?.fullName }
       </Typography>
     </Breadcrumbs>
+
+    <Grid container spacing={1} padding={1} marginBottom={1}>
+      <Grid item xs={1}><Typography variant="subtitle2">Email:</Typography></Grid>
+      <Grid item xs={11}>{tenant?.email}</Grid>
+      <Grid item xs={1}><Typography variant="subtitle2">Move in date:</Typography></Grid>
+      <Grid item xs={11}>{tenant?.moveInDate}</Grid>
+      <Grid item xs={1}><Typography variant="subtitle2">Billing start date:</Typography></Grid>
+      <Grid item xs={11}>{tenant?.billingStartDate}</Grid>
+    </Grid>
+
     <Box sx={{ height: 400, width: '100%' }}>
       <DataGrid
         rows={invoices}
         columns={columns}
         disableSelectionOnClick
       />
-      { JSON.stringify(tenant) }
     </Box>
   </>
 }

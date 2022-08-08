@@ -7,7 +7,6 @@ import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 
 const Admin = () => {
-  const { tokenized } = useAuth();
   const [landlords, setLandlords] = useState([])
   const [tenants, setTenants] = useState([])
 
@@ -80,10 +79,9 @@ const Admin = () => {
   }
 
   useEffect(async () => {
-    if (!tokenized) return
     getLandlords()
     getTenants()
-  }, [tokenized])
+  }, [])
 
   const handleDeleteLandlord = async (landlordId) => {
     await axios.delete(`/api/landlordUsers/${landlordId}`)
