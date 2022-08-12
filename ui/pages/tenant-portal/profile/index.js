@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth0 } from "@auth0/auth0-react";
 import useAuth from 'hooks/useAuth'
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Typography from '@mui/material/Typography';
+import Crumbs from 'components/Crumbs';
 import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
@@ -56,9 +55,10 @@ const TenantProfile = () => {
   }
 
   return <>
-    <Breadcrumbs aria-label="breadcrumb">
-      <Typography color="text.primary">Profile</Typography>
-    </Breadcrumbs>
+    <Crumbs crumbs={[{
+        title: 'Profile'
+      }]}
+    />
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box m={2}>
         <Grid container spacing={2}>

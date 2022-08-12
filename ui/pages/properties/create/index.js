@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Typography from '@mui/material/Typography';
+import Crumbs from 'components/Crumbs'
 import LoadingButton from '@mui/lab/LoadingButton';
-import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
@@ -35,12 +33,13 @@ const CreateProperty = () => {
   }
 
   return <>
-    <Breadcrumbs aria-label="breadcrumb">
-      <Link className="pointer" underline="hover" color="inherit" onClick={() => router.push(MANAGEMENT_PORTAL_BASE_ROUTE)} >
-        Properties
-      </Link>
-      <Typography color="text.primary">Create</Typography>
-    </Breadcrumbs>
+    <Crumbs crumbs={[{
+        title: 'Properties',
+        onClick: () => router.push(MANAGEMENT_PORTAL_BASE_ROUTE)
+      }, {
+        title: 'Create'
+      }]}
+    />
     <form onSubmit={handleSubmit(onSubmit)}>
       <Box m={2}>
         <Grid container spacing={2}>

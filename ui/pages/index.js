@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Typography from '@mui/material/Typography';
+import Crumbs from 'components/Crumbs'
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -59,9 +58,10 @@ const Properties = () => {
   }, [])
 
   return <>
-    <Breadcrumbs aria-label="breadcrumb">
-      <Typography color="text.primary">Properties</Typography>
-    </Breadcrumbs>
+    <Crumbs crumbs={[{
+        title: 'Properties'
+      }]}
+    />
     <Box m={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Button onClick={() => router.push('/properties/create')}>Create</Button>
     </Box>

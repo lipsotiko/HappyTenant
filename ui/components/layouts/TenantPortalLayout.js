@@ -19,10 +19,6 @@ export const getLayout = page => {
           name: 'Home',
           icon: <Home />,
           route: TENANT_PORTAL_BASE_ROUTE
-        }, {
-          name: 'Settings',
-          icon: <SettingsIcon />,
-          route: `${TENANT_PORTAL_BASE_ROUTE}/settings`
         }
       ]}
       loginRedirect={`${TENANT_PORTAL_BASE_ROUTE}/login`}

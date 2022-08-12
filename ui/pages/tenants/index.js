@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Crumbs from 'components/Crumbs'
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -57,9 +57,10 @@ const Tenants = () => {
   }
 
   return <>
-    <Breadcrumbs aria-label="breadcrumb">
-      <Typography color="text.primary">Tenants</Typography>
-    </Breadcrumbs>
+    <Crumbs crumbs={[{
+        title: 'Tenants'
+      }]}
+    />
     <Box m={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Button onClick={() => router.push('/tenants/create')}>Create</Button>
     </Box>

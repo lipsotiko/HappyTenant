@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Crumbs from 'components/Crumbs';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { getLayout } from 'components/layouts/TenantPortalLayout'
@@ -38,9 +38,10 @@ const TenantPortal = () => {
   }
 
   return <>
-    <Breadcrumbs aria-label="breadcrumb">
-      <Typography color="text.primary">Home</Typography>
-    </Breadcrumbs>
+    <Crumbs crumbs={[{
+        title: 'Home'
+      }]}
+    />
     <Box sx={{ margin: '32px' }}>
       <Grid container spacing={2}>
         { properties.map(p => {

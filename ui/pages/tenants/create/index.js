@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import Breadcrumbs from '@mui/material/Breadcrumbs';
+import Crumbs from 'components/Crumbs';
 import Typography from '@mui/material/Typography';
 import LoadingButton from '@mui/lab/LoadingButton';
 import Button from '@mui/material/Button';
@@ -178,12 +178,13 @@ const Create = () => {
   };
 
   return <>
-    <Breadcrumbs aria-label="breadcrumb">
-      <Link className="pointer" underline="hover" color="inherit" onClick={() => router.push(TENANTS_ROUTE)} >
-        Tenants
-      </Link>
-      <Typography color="text.primary">Create</Typography>
-    </Breadcrumbs>
+    <Crumbs crumbs={[{
+        title: 'Tenants',
+        onClick: () => router.push(TENANTS_ROUTE)
+      }, {
+        title: 'Create'
+      }]}
+    />
     <Box m={2}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stepper activeStep={activeStep}>
