@@ -77,7 +77,7 @@ const Admin = () => {
     setTenants(tenantUsers)
   }
 
-  useEffect(async () => {
+  useEffect(() => {
     getLandlords()
     getTenants()
   }, [])

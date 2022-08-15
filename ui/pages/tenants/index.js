@@ -48,7 +48,7 @@ const Tenants = () => {
     setTenants(data)
   }
 
-  useEffect(async () => {
+  useEffect(() => {
     getTenants()
   }, [])
 

@@ -44,18 +44,17 @@ const Properties = () => {
     }
   ]
 
-  const getProperties = async () => {
-    const { data: { _embedded: { properties }} } = await axios.get('/api/properties/search/findByCreatedBy', {
-      params: {
-        email: user.email
-      }
-    })
-    setProperties(properties)
-  }
-
-  useEffect(async () => {
+  useEffect(() => {
+    const getProperties = async () => {
+      const { data: { _embedded: { properties }} } = await axios.get('/api/properties/search/findByCreatedBy', {
+        params: {
+          email: user.email
+        }
+      })
+      setProperties(properties)
+    }
     getProperties()
-  }, [])
+  }, [user])
 
   return <>
     <Crumbs crumbs={[{

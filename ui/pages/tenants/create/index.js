@@ -93,23 +93,29 @@ const Create = () => {
   const showHelperText = (name) => errors[name]?.message
   const showError = (name) => errors[name] !== undefined
 
-  useEffect(async () => {
-    const { data: { _embedded: { properties }} } = await axios.get('/api/properties/search/findByCreatedBy', {
-      params: {
-        email: user.email
-      }
-    })
-    setProperties(properties)
-  }, [])
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const { data: { _embedded: { properties }} } = await axios.get('/api/properties/search/findByCreatedBy', {
+        params: {
+          email: user.email
+        }
+      })
+      setProperties(properties)
+    }
+    fetchProperties()
+  }, [user])
 
-  useEffect(async () => {
-    await axios.get('/api/landlord-user/profile', {
-      params: {
-        returnPath: '/tenants/create'
-      }
-    }).then(({ data }) => {
-      setLandlord(data)
-    })
+  useEffect(() => {
+    const fetchProfile = async () => {
+      await axios.get('/api/landlord-user/profile', {
+        params: {
+          returnPath: '/tenants/create'
+        }
+      }).then(({ data }) => {
+        setLandlord(data)
+      })
+    }
+    fetchProfile()
   }, [])
 
   const invoiceMemo = useMemo(() => {
@@ -156,7 +162,7 @@ const Create = () => {
     total = (Math.round((total + Number.EPSILON) * 100) / 100).toFixed(2)
 
     return { items, total };
-  }, [createMonthlySubscription, addProratedFirstMonthsRent, addLastMonthsRentToInvoice, addSecurityDepositToInvoice, securityDeposit])
+  }, [addProratedFirstMonthsRent, addLastMonthsRentToInvoice, addSecurityDepositToInvoice, securityDeposit, billingStartDate, getValues, moveInDate, properties])
 
   if (!landlord || !properties) {
     return <></>

@@ -14,13 +14,12 @@ const TenantPortal = () => {
   const [properties, setProperties] = useState([])
   const router = useRouter();
 
-  const getProperties = async () => {
-    const { data: { tenant, properties } } = await axios.get('/api/properties/tenant/all')
-    setTenant(tenant)
-    setProperties(properties)
-  }
-
-  useEffect(async () => {
+  useEffect(() => {
+    const getProperties = async () => {
+      const { data: { tenant, properties } } = await axios.get('/api/properties/tenant/all')
+      setTenant(tenant)
+      setProperties(properties)
+    }
     getProperties()
   }, [])
 
@@ -44,8 +43,8 @@ const TenantPortal = () => {
     <Box sx={{ margin: '32px' }}>
       <Grid container spacing={2}>
         { properties.map(p => {
-          return <Grid item xs={8} sm={6} md={4} lg={3}>
-            <Item key={`property_${p.id}`} className='pointer' onClick={() => handleSelect()}>
+          return <Grid key={`property_${p.id}`} item xs={8} sm={6} md={4} lg={3}>
+            <Item className='pointer' onClick={() => handleSelect()}>
               <Typography>{ p.address }</Typography>
               <Typography variant="caption">${ p.rent } / Month</Typography>
             </Item>

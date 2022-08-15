@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -36,11 +37,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return jwtDecoder;
     }
 
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        web.ignoring().antMatchers("/**");
+//    }
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .mvcMatchers("/").permitAll()
                 .mvcMatchers(HttpMethod.POST, "/api/sign-up/**").permitAll()
+                .mvcMatchers(HttpMethod.GET, "/api/version/**").permitAll()
 //                .mvcMatchers("/api/private-scoped").hasAuthority("SCOPE_read:messages")
                 .mvcMatchers("/api/**").authenticated()
                 .and().cors()

@@ -15,19 +15,22 @@ const TenantProfile = () => {
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  useEffect(async () => {
-    await axios.get('/api/tenantUsers/search/findByCreatedBy', {
-      params: {
-        email: user.email
-      }
-    }).then(({ data }) => {
-      setTenant(data)
-    }).catch(() => {
-      setTenant({
-        email: user.email
+  useEffect(() => {
+    const fetchProfile = async () => {
+      await axios.get('/api/tenantUsers/search/findByCreatedBy', {
+        params: {
+          email: user.email
+        }
+      }).then(({ data }) => {
+        setTenant(data)
+      }).catch(() => {
+        setTenant({
+          email: user.email
+        })
       })
-    })
-  }, [])
+    }
+    fetchProfile()
+  }, [user])
 
   const onSubmit = async data => {
     setSaving(true)

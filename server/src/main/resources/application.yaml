@@ -9,9 +9,6 @@ spring:
   data:
     rest:
       base-path: /api
-    mongodb:
-      uri: mongodb://localhost:27888/htdb  #${MONGODB_URI}
-
 auth0:
   connection: "Username-Password-Authentication"
   audience: "https://happy-tenant.meraklis.io/api"
@@ -20,5 +17,18 @@ auth0:
 email:
   no-reply: "no-reply@meraklis.io"
   sendgrid-api-key: ${SENDGRID_API_KEY}
-landlord-portal-url: "http://localhost:3000/"
-tenant-portal-url: "http://localhost:3000/tenant-portal"
+landlord-portal-url: "https://dev.meraklis.io/"
+tenant-portal-url: "https://dev.meraklis.io/tenant-portal"
+---
+
+spring:
+  profiles: test
+  data:
+    mongodb:
+      uri: mongodb://localhost:27888/htdb
+---
+spring:
+  profiles: dev
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}

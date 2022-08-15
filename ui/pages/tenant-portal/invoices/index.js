@@ -11,9 +11,12 @@ const InvoicesPage = () => {
   const router = useRouter()
   const [invoices, setInvoices] = useState()
 
-  useEffect(async () => {
-    const { data } = await axios.get(`/api/tenants/current-user-invoices`)
-    setInvoices(data)
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      const { data } = await axios.get(`/api/tenants/current-user-invoices`)
+      setInvoices(data)
+    }
+    fetchInvoices()
   }, [])
 
   if (!invoices) {

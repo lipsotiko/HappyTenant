@@ -18,14 +18,17 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
-  useEffect(async () => {
-    await axios.get('/api/landlord-user/profile', {
-      params: {
-        returnPath: '/profile'
-      }
-    }).then(({ data }) => {
-      setLandlord(data)
-    })
+  useEffect(() => {
+    const fetchProfile = async () => {
+      await axios.get('/api/landlord-user/profile', {
+        params: {
+          returnPath: '/profile'
+        }
+      }).then(({ data }) => {
+        setLandlord(data)
+      })
+    }
+    fetchProfile()
   }, [])
 
   const onSubmit = async data => {
@@ -41,10 +44,6 @@ const Profile = () => {
   const showError = (name) => {
     return errors[name] !== undefined
   }
-
-  const landlordMemo = useMemo(() => {
-    return landlord
-  }, [landlord])
 
   if (!landlord) {
     return <></>

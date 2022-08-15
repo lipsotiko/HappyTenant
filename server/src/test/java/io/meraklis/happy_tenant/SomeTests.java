@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.Period;
 import org.junit.jupiter.api.Test;
 
 public class SomeTests {

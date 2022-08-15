@@ -16,7 +16,7 @@ const TenantLogin = () => {
       display: 'flex',
       justifyContent: 'flex-end'
     }}>
-      <Typography className={styles.dontHaveAccount}>Don't have an account? </Typography>
+      <Typography className={styles.dontHaveAccount}>Don&apos;t have an account? </Typography>
       <Button variant="outlined" onClick={() => push('/tenant-portal/signup')}>Sign Up</Button>
     </Box>
     <Container maxWidth="sm">

@@ -15,20 +15,20 @@ const Tenant = () => {
   const [tenant, setTenant] = useState()
   const [invoices, setInvoices] = useState([])
 
-  const getTenant = async () => {
-    const { data } = await axios.get(`/api/tenants/${id}`)
-    setTenant(data)
-  }
+  useEffect(() => {
+    const getTenant = async () => {
+      const { data } = await axios.get(`/api/tenants/${id}`)
+      setTenant(data)
+    }
 
-  const getInvoices = async () => {
-    const { data } = await axios.get(`/api/tenants/${id}/invoices`)
-    setInvoices(data)
-  }
+    const getInvoices = async () => {
+      const { data } = await axios.get(`/api/tenants/${id}/invoices`)
+      setInvoices(data)
+    }
 
-  useEffect(async () => {
     getTenant()
     getInvoices()
-  }, [])
+  }, [id])
 
   return <>
     <Crumbs crumbs={[{

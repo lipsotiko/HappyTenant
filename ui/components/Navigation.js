@@ -130,14 +130,14 @@ const Navigation = ({ children, subtitle, profilePath, menuItems = [], loginRedi
     if (!isLoading && !isAuthenticated) {
       router.push(loginRedirect)
     }
-  }, [isLoading, isAuthenticated])
+  }, [isLoading, isAuthenticated, loginRedirect, router])
 
   useEffect(() => {
     const item = menuItems.find(item => item.route === router.pathname)
     if (item) {
       setSelected(item.name)
     }
-  }, []);
+  }, [menuItems, router]);
 
   const handleSelect = (item) => {
     setSelected(item.name)
@@ -160,7 +160,7 @@ const Navigation = ({ children, subtitle, profilePath, menuItems = [], loginRedi
       return adminMenuItems
     }
     return menuItems
-  }, [isAuthenticated, isLoading])
+  }, [menuItems, user])
 
   if (isLoading || !isAuthenticated) {
     return <></>

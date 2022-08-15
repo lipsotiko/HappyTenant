@@ -12,14 +12,13 @@ const Property = () => {
   const { id } = router.query
   const [property, setProperty] = useState()
 
-  const getProperty = async () => {
-    const { data } = await axios.get(`/api/properties/${id}`)
-    setProperty(data)
-  }
-
-  useEffect(async () => {
+  useEffect(() => {
+    const getProperty = async () => {
+      const { data } = await axios.get(`/api/properties/${id}`)
+      setProperty(data)
+    } 
     getProperty()
-  }, [])
+  }, [id])
 
   if (!property) return <></>
 
