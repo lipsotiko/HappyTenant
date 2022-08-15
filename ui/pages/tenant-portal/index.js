@@ -6,24 +6,23 @@ import { getLayout } from 'components/layouts/TenantPortalLayout'
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-import useAuth from 'hooks/useAuth'
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
 const TenantPortal = () => {
-  const { tokenized } = useAuth();
+  const [tenant, setTenant] = useState()
   const [properties, setProperties] = useState([])
   const router = useRouter();
 
   const getProperties = async () => {
-    const { data } = await axios.get('/api/properties/tenant/all')
-    setProperties(data)
+    const { data: { tenant, properties } } = await axios.get('/api/properties/tenant/all')
+    setTenant(tenant)
+    setProperties(properties)
   }
 
   useEffect(async () => {
-    if (!tokenized) return
     getProperties()
-  }, [tokenized])
+  }, [])
 
   const Item = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -33,8 +32,8 @@ const TenantPortal = () => {
     height: '100px'
   }));
 
-  const handlePropertySelect = (propertyId) => {
-    router.push(`/tenant-portal/properties/${propertyId}`)
+  const handleSelect = () => {
+    router.push(`/tenant-portal/invoices`)
   }
 
   return <>
@@ -46,7 +45,7 @@ const TenantPortal = () => {
       <Grid container spacing={2}>
         { properties.map(p => {
           return <Grid item xs={8} sm={6} md={4} lg={3}>
-            <Item key={`property_${p.id}`} className='pointer'onClick={() => handlePropertySelect(p.id)}>
+            <Item key={`property_${p.id}`} className='pointer' onClick={() => handleSelect()}>
               <Typography>{ p.address }</Typography>
               <Typography variant="caption">${ p.rent } / Month</Typography>
             </Item>

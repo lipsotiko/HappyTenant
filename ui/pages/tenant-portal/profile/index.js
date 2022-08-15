@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { useAuth0 } from "@auth0/auth0-react";
-import useAuth from 'hooks/useAuth'
 import Crumbs from 'components/Crumbs';
 import LoadingButton from '@mui/lab/LoadingButton';
 import TextField from '@mui/material/TextField';
@@ -12,13 +11,11 @@ import axios from 'axios';
 
 const TenantProfile = () => {
   const { user } = useAuth0();
-  const { tokenized } = useAuth();
   const [tenant, setTenant] = useState()
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
 
   useEffect(async () => {
-    if (!tokenized) return
     await axios.get('/api/tenantUsers/search/findByCreatedBy', {
       params: {
         email: user.email
@@ -30,7 +27,7 @@ const TenantProfile = () => {
         email: user.email
       })
     })
-  }, [tokenized])
+  }, [])
 
   const onSubmit = async data => {
     setSaving(true)

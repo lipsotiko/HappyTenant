@@ -8,7 +8,6 @@ import Divider from '@mui/material/Divider';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import axios from 'axios';
-import useAuth from 'hooks/useAuth'
 import { MANAGEMENT_PORTAL_BASE_ROUTE } from 'util/constants'
 import { getLayout } from 'components/layouts/LandlordLayout'
 
@@ -16,7 +15,6 @@ const CreateProperty = () => {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
-  useAuth();
 
   const onSubmit = async data => {
     setSaving(true)

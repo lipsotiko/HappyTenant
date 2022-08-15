@@ -2,23 +2,21 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { getLayout } from 'components/layouts/TenantPortalLayout'
 import Crumbs from 'components/Crumbs';
+import Invoices from 'components/Invoices'
 import { TENANT_PORTAL_BASE_ROUTE } from 'util/constants'
-import useAuth from 'hooks/useAuth'
+import Box from '@mui/material/Box';
 import axios from 'axios';
 
-const Property = () => {
-  const { tokenized } = useAuth();
+const InvoicesPage = () => {
   const router = useRouter()
-  const { id } = router.query
-  const [property, setProperty] = useState()
+  const [invoices, setInvoices] = useState()
 
   useEffect(async () => {
-    if (!tokenized) return
-    const { data } = await axios.get(`/api/properties/${id}`)
-    setProperty(data)
-  }, [tokenized])
+    const { data } = await axios.get(`/api/tenants/current-user-invoices`)
+    setInvoices(data)
+  }, [])
 
-  if (!property) {
+  if (!invoices) {
     return <></>
   }
 
@@ -28,14 +26,16 @@ const Property = () => {
           title: 'Home',
           onClick: () => router.push(TENANT_PORTAL_BASE_ROUTE)
         }, {
-          title: property.address
+          title: 'Invoices'
         }
       ]}
     />
-    <span>Add payment method</span>
+    <Box sx={{ height: 400, width: '100%' }}>
+      <Invoices invoices={invoices} />
+    </Box>
   </>
 }
 
-Property.getLayout = getLayout
+InvoicesPage.getLayout = getLayout
 
-export default Property
+export default InvoicesPage

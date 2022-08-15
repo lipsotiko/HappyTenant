@@ -3,7 +3,6 @@ import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import { getLayout } from 'components/layouts/LandlordLayout'
-import useAuth from 'hooks/useAuth'
 import axios from 'axios';
 
 const Admin = () => {

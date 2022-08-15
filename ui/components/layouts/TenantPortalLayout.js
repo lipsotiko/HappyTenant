@@ -1,7 +1,8 @@
 import Navigation from 'components/Navigation'
 import { Auth0Provider } from "@auth0/auth0-react";
 import Home from '@mui/icons-material/Home';
-import SettingsIcon from '@mui/icons-material/Settings';
+import ReceiptIcon from '@mui/icons-material/Receipt';
+import AuthToken from 'components/AuthToken'
 import { TENANT_PORTAL_BASE_ROUTE } from 'util/constants'
 
 export const getLayout = page => {
@@ -19,12 +20,18 @@ export const getLayout = page => {
           name: 'Home',
           icon: <Home />,
           route: TENANT_PORTAL_BASE_ROUTE
+        }, {
+          name: 'Invoices',
+          icon: <ReceiptIcon />,
+          route: TENANT_PORTAL_BASE_ROUTE + "/invoices"
         }
       ]}
       loginRedirect={`${TENANT_PORTAL_BASE_ROUTE}/login`}
       profilePath={`${TENANT_PORTAL_BASE_ROUTE}/profile`}
     >
-      {page}
+      <AuthToken>
+        {page}
+      </AuthToken>
     </Navigation>
   </Auth0Provider>
 }
