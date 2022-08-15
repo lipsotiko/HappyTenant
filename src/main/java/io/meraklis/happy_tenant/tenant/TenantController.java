@@ -7,7 +7,6 @@ import io.meraklis.happy_tenant.property.Property;
 import io.meraklis.happy_tenant.property.PropertyRepository;
 import io.meraklis.happy_tenant.security.AbstractAuditor;
 import io.meraklis.happy_tenant.security.CurrentUserAuditor;
-import io.meraklis.happy_tenant.user.landlord.LandlordUser;
 import io.meraklis.happy_tenant.user.landlord.LandlordUserRepository;
 import java.io.IOException;
 import java.util.Collections;
@@ -45,6 +44,9 @@ public class TenantController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private TenantService tenantService;
+
     @GetMapping("/all")
     public List<Tenant> findByCreatedBy() {
         Optional<String> currentUserEmail = currentUserAuditor.getCurrentAuditor();
@@ -66,6 +68,16 @@ public class TenantController {
                 .flatMap(tenant -> landlordUserRepository.findByCreatedBy(email)
                         .map(landlordUser -> paymentService.getCustomerInvoices(tenant.getPaymentCustomerId(),
                                 landlordUser.getPaymentAccountId())))).orElse(null);
+    }
+
+    @GetMapping("/current-user-invoices")
+    public List<Invoice> getInvoices() {
+        return currentUserAuditor.getCurrentAuditor()
+                .map(email -> tenantService.findByEmail(email)
+                        .map(tenant -> paymentService.getCustomerInvoices(tenant.getPaymentCustomerId(),
+                                tenant.getProperty().getMetadata().getAccountId()))
+                        .orElseThrow())
+                .orElseThrow();
     }
 
     @PostMapping("/resend-invitation/{tenantId}")
