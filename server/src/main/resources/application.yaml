@@ -7,6 +7,8 @@ spring:
         jwt:
           issuer-uri:  ${AUTH0_DOMAIN}
   data:
+    mongodb:
+      uri: mongodb://localhost:27888/htdb
     rest:
       base-path: /api
 auth0:
@@ -17,8 +19,8 @@ auth0:
 email:
   no-reply: "no-reply@meraklis.io"
   sendgrid-api-key: ${SENDGRID_API_KEY}
-landlord-portal-url: "https://dev.meraklis.io/"
-tenant-portal-url: "https://dev.meraklis.io/tenant-portal"
+landlord-portal-url: "http://localhost:3000/login/"
+tenant-portal-url: "http://localhost:3000/tenant-portal"
 ---
 
 spring:
@@ -32,3 +34,5 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+landlord-portal-url: "https://happy-tenant.herokuapp.com/login/"
+tenant-portal-url: "https://happy-tenant.herokuapp.com/tenant-portal"
