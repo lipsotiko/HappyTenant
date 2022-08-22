@@ -41,7 +41,7 @@ import { TENANTS_ROUTE } from 'util/constants'
 const Create = () => {
   const { user } = useAuth0();
   const router = useRouter();
-  const [properties, setProperties] = useState()
+  const [properties, setProperties] = useState([])
   const [landlord, setLandlord] = useState()
   const [saving, setSaving] = useState(false);
   const [moveInDate, setMoveInDate] = useState(null)

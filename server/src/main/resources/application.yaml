@@ -19,7 +19,7 @@ auth0:
 email:
   no-reply: "no-reply@meraklis.io"
   sendgrid-api-key: ${SENDGRID_API_KEY}
-landlord-portal-url: "http://localhost:3000/login/"
+landlord-portal-url: "http://localhost:3000/login"
 tenant-portal-url: "http://localhost:3000/tenant-portal"
 ---
 
@@ -34,5 +34,5 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
-landlord-portal-url: "https://happy-tenant.herokuapp.com/login/"
+landlord-portal-url: "https://happy-tenant.herokuapp.com/login"
 tenant-portal-url: "https://happy-tenant.herokuapp.com/tenant-portal"
