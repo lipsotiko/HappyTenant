@@ -404,7 +404,7 @@ const Create = () => {
               </Button>
               <Box sx={{ flex: '1 1 auto' }} />
               {activeStep < steps.length - 1 &&
-                <Button onClick={handleNext}>
+                <Button onClick={handleNext} disabled={!landlord?.paymentAccountStatus?.isOnboarded}>
                   Next
                 </Button>
               }

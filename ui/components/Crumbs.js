@@ -6,8 +6,8 @@ const Crumbs = ({ crumbs = [] }) => {
   return <Breadcrumbs aria-label="breadcrumb">
     { crumbs.map(({ title, onClick }, i) => {
       return (onClick)
-        ? <Link id={`crumb_${i}`} underline="hover" className="pointer" color="inherit" onClick={onClick}>{title}</Link>
-        : <Typography id={`crumb_${i}`} color="text.primary">{title}</Typography>
+        ? <Link key={`crumb_${i}`} underline="hover" className="pointer" color="inherit" onClick={onClick}>{title}</Link>
+        : <Typography key={`crumb_${i}`} color="text.primary">{title}</Typography>
     })}
   </Breadcrumbs>
 }
