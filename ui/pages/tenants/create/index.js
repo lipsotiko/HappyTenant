@@ -145,7 +145,7 @@ const Create = () => {
       const proratedDays = billingStartDateMoment.diff(moveInDateMoment, 'days')
       const proratedRent = ((rent * 12) / 365) * proratedDays
       items.push({
-        name:  `${address} - Prorated first months rent`,
+        name:  `${address} - Prorated first month's rent`,
         calories: proratedRent.toFixed(2)
       })
       total += proratedRent
@@ -153,7 +153,7 @@ const Create = () => {
 
     if (addLastMonthsRentToInvoice) {
       items.push({
-        name:  `${address} - Last months rent`,
+        name:  `${address} - Last month's rent`,
         calories: parseFloat(rent).toFixed(2)
       })
       total += rent
@@ -325,8 +325,8 @@ const Create = () => {
                 <Grid item sm={6}>
                   <FormGroup>
                     <FormControlLabel control={<Checkbox checked={createMonthlySubscription} {...register('createMonthlySubscription')} />} label="Generate monthly invoices to collect rent" />
-                    <FormControlLabel control={<Checkbox checked={addProratedFirstMonthsRent} {...register('addProratedFirstMonthsRent')} />} label="Add first months prorated rent to initial invoice" />
-                    <FormControlLabel control={<Checkbox checked={addLastMonthsRentToInvoice} {...register('addLastMonthsRentToInvoice')} />} label="Add last months rent to initial invoice" />
+                    <FormControlLabel control={<Checkbox checked={addProratedFirstMonthsRent} {...register('addProratedFirstMonthsRent')} />} label="Add first month's prorated rent to initial invoice" />
+                    <FormControlLabel control={<Checkbox checked={addLastMonthsRentToInvoice} {...register('addLastMonthsRentToInvoice')} />} label="Add last month's rent to initial invoice" />
                     <FormControlLabel control={<Checkbox checked={addSecurityDepositToInvoice} {...register('addSecurityDepositToInvoice', { onChange: ({target: { checked }})=> {
                       if (!checked) { clearErrors('securityDeposit') }
                       } } ) } />} label="Add security deposit to initial invoice" />
