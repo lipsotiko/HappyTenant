@@ -24,4 +24,13 @@ public class SomeTests {
         assertEquals(81.18, proratedFirstMonthsRent);
     }
 
+    @Test
+    public void fileFilter() {
+        String path = "/properties/create/123345";
+        int i = path.lastIndexOf("/");
+        String id = path.substring(i + 1);
+        String replace = path.replace(id, "[id].html");
+        System.out.println(replace);
+    }
+
 }

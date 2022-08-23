@@ -1,7 +1,5 @@
 #!/bin/sh
 
-./build.sh
-
 heroku config:set AUTH0_DOMAIN=$AUTH0_DOMAIN
 heroku config:set AUTH0_CLIENT_ID=$AUTH0_CLIENT_ID
 heroku config:set AUTH0_CLIENT_SECRET=$AUTH0_CLIENT_SECRET
