@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import Crumbs from 'components/Crumbs'
+import LoadingOverlay from 'components/LoadingOverlay'
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -11,6 +12,7 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axios from 'axios';
 
 const Properties = () => {
+  const [isLoading, setIsLoading] = useState(true)
   const { user } = useAuth0();
   const router = useRouter();
   const [properties, setProperties] = useState([])
@@ -52,9 +54,14 @@ const Properties = () => {
         }
       })
       setProperties(properties)
+      setIsLoading(false)
     }
     getProperties()
   }, [user])
+
+  if (isLoading) {
+    return <LoadingOverlay />
+  }
 
   return <>
     <Crumbs crumbs={[{
@@ -64,7 +71,7 @@ const Properties = () => {
     <Box m={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Button onClick={() => router.push('/properties/create')}>Create</Button>
     </Box>
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ height: 400 }}>
       <DataGrid
         rows={properties}
         columns={columns}

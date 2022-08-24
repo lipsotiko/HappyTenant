@@ -64,7 +64,7 @@ const Tenants = () => {
     <Box m={2} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
       <Button onClick={() => router.push('/tenants/create')}>Create</Button>
     </Box>
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ height: 400 }}>
       <DataGrid
         rows={tenants}
         columns={columns}

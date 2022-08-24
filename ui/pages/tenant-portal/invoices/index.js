@@ -9,7 +9,7 @@ import axios from 'axios';
 
 const InvoicesPage = () => {
   const router = useRouter()
-  const [invoices, setInvoices] = useState()
+  const [invoices, setInvoices] = useState([])
 
   useEffect(() => {
     const fetchInvoices = async () => {
@@ -18,10 +18,6 @@ const InvoicesPage = () => {
     }
     fetchInvoices()
   }, [])
-
-  if (!invoices) {
-    return <></>
-  }
 
   return <>
     <Crumbs crumbs={[
@@ -33,7 +29,7 @@ const InvoicesPage = () => {
         }
       ]}
     />
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ margin: '32px', height: 400 }}>
       <Invoices invoices={invoices} />
     </Box>
   </>

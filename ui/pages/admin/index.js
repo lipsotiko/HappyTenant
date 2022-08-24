@@ -94,7 +94,7 @@ const Admin = () => {
 
   return <>
     <p>Landlords</p>
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ height: 400 }}>
       <DataGrid
         rows={landlords}
         columns={landLordColumns}
@@ -102,7 +102,7 @@ const Admin = () => {
       />
     </Box>
     <p>Tenants</p>
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Box sx={{ height: 400 }}>
       <DataGrid
         rows={tenants}
         columns={tenantsColumns}
