@@ -1,10 +1,13 @@
 import { useEffect, useState, useMemo } from 'react'
+import { useDispatch } from 'react-redux'
+import { showLoadingOverlay, hideLoadingOverlay } from 'hooks/reducers/loading'
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from 'axios';
 
 const useAuth = () => {
   const [hasToken, setHasToken] = useState(false)
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0();
+  const dispatch = useDispatch()
 
   const tokenized = useMemo(() => {
     return hasToken
@@ -12,11 +15,23 @@ const useAuth = () => {
 
   useEffect(() => {
     const getToken = async () => {
+      dispatch(showLoadingOverlay())
       const accessToken = await getAccessTokenSilently();
+      dispatch(hideLoadingOverlay())
+
       axios.interceptors.request.use((request) => {
+        console.log('api request')
+        dispatch(showLoadingOverlay())
         request.headers['Authorization'] = `Bearer ${accessToken}`
         return request
       })
+
+      axios.interceptors.response.use((response) => {
+        console.log('api response')
+        dispatch(hideLoadingOverlay())
+        return response
+      })
+
       setHasToken(true)
     }
 

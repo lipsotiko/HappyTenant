@@ -4,6 +4,7 @@ import Home from '@mui/icons-material/Home';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import AuthToken from 'components/AuthToken'
 import { TENANT_PORTAL_BASE_ROUTE } from 'util/constants'
+import LoadingOverlay from 'components/LoadingOverlay'
 
 export const getLayout = page => {
   return <Auth0Provider
@@ -31,6 +32,7 @@ export const getLayout = page => {
     >
       <AuthToken>
         {page}
+        <LoadingOverlay />
       </AuthToken>
     </Navigation>
   </Auth0Provider>

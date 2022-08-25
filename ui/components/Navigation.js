@@ -20,6 +20,7 @@ import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import LoadingOverlayPersistant from 'components/LoadingOverlayPersistant'
 
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRouter } from 'next/router';
@@ -163,7 +164,7 @@ const Navigation = ({ children, subtitle, profilePath, menuItems = [], loginRedi
   }, [menuItems, user])
 
   if (isLoading || !isAuthenticated) {
-    return <></>
+    return <LoadingOverlayPersistant />
   }
 
   return (

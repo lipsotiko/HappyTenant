@@ -1,13 +1,13 @@
-import Backdrop from '@mui/material/Backdrop';
-import CircularProgress from '@mui/material/CircularProgress';
+import LoadingOverlayPersistant from './LoadingOverlayPersistant'
+import { useSelector } from 'react-redux'
 
-const LoadingOverlay = () => {
-  return <Backdrop
-    sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-    open={true}
-  >
-    <CircularProgress color="inherit" />
-  </Backdrop>
+const LoadingOverlay = ({ override = false }) => {
+  const loading = useSelector(state => state.loading.value)
+  const show = (override) ? true : loading
+
+  return (show)
+    ? <LoadingOverlayPersistant />
+    : <></>
 }
 
 export default LoadingOverlay

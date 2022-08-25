@@ -4,8 +4,12 @@ import AuthToken from 'components/AuthToken'
 import GroupsIcon from '@mui/icons-material/Groups';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
 import { MANAGEMENT_PORTAL_BASE_ROUTE, TENANTS_ROUTE } from 'util/constants'
+import store from 'hooks/store'
+import { Provider } from 'react-redux'
+import LoadingOverlay from 'components/LoadingOverlay'
 
 export const getLayout = page => {
+
   return <Auth0Provider
     domain={process.env.NEXT_PUBLIC_AUTH0_DOMAIN}
     clientId={process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID}
@@ -13,25 +17,28 @@ export const getLayout = page => {
     audience={process.env.NEXT_PUBLIC_AUTH0_AUDIENCE}
     scope={process.env.NEXT_PUBLIC_AUTH0_SCOPE}
     >
-    <Navigation
-      subtitle="Management Portal"
-      menuItems={[
-        {
-          name: 'Properties',
-          icon: <MapsHomeWorkIcon />,
-          route: MANAGEMENT_PORTAL_BASE_ROUTE
-        }, {
-          name: 'Tenants',
-          icon: <GroupsIcon />,
-          route: TENANTS_ROUTE
-        }
-      ]}
-      loginRedirect="/login"
-      profilePath="/profile"
-    >
-      <AuthToken>
-        {page}
-      </AuthToken>
-    </Navigation>
+    <Provider store={store}>
+      <Navigation
+        subtitle="Management Portal"
+        menuItems={[
+          {
+            name: 'Properties',
+            icon: <MapsHomeWorkIcon />,
+            route: MANAGEMENT_PORTAL_BASE_ROUTE
+          }, {
+            name: 'Tenants',
+            icon: <GroupsIcon />,
+            route: TENANTS_ROUTE
+          }
+        ]}
+        loginRedirect="/login"
+        profilePath="/profile"
+      >
+        <AuthToken>
+          {page}
+          <LoadingOverlay />
+        </AuthToken>
+      </Navigation>
+    </Provider>
   </Auth0Provider>
 }

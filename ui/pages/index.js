@@ -12,7 +12,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import axios from 'axios';
 
 const Properties = () => {
-  const [isLoading, setIsLoading] = useState(true)
   const { user } = useAuth0();
   const router = useRouter();
   const [properties, setProperties] = useState([])
@@ -54,14 +53,9 @@ const Properties = () => {
         }
       })
       setProperties(properties)
-      setIsLoading(false)
     }
     getProperties()
   }, [user])
-
-  if (isLoading) {
-    return <LoadingOverlay />
-  }
 
   return <>
     <Crumbs crumbs={[{
