@@ -20,14 +20,12 @@ const useAuth = () => {
       dispatch(hideLoadingOverlay())
 
       axios.interceptors.request.use((request) => {
-        console.log('api request')
         dispatch(showLoadingOverlay())
         request.headers['Authorization'] = `Bearer ${accessToken}`
         return request
       })
 
       axios.interceptors.response.use((response) => {
-        console.log('api response')
         dispatch(hideLoadingOverlay())
         return response
       })

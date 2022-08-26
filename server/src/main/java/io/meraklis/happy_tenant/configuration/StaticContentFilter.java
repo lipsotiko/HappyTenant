@@ -13,8 +13,10 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class StaticContentFilter implements Filter {
 
@@ -53,6 +55,7 @@ public class StaticContentFilter implements Filter {
                     if (staticFileExists(htmlIdPath)) {
                         resourceToResponse(htmlIdPath, response);
                     } else {
+                        log.debug("Static page does not exist: {}", path);
                         resourceToResponse("/404.html", response);
                     }
                 }
