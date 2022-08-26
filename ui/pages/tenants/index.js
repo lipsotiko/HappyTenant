@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
 import Crumbs from 'components/Crumbs'
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
@@ -33,13 +32,6 @@ const Tenants = () => {
       valueGetter: (params) => {
         return params.row?.property?.address
       }
-    }, {
-      field: 'actions',
-      headerName: 'Actions',
-      width: 120,
-      renderCell: (params) => <>
-        <Link id={`invite${params.row.id}`} className='pointer' onClick={() => handleInvite(params.row.id)}>Resend invite</Link>
-      </>
     }
   ]
 
@@ -51,10 +43,6 @@ const Tenants = () => {
   useEffect(() => {
     getTenants()
   }, [])
-
-  const handleInvite = (tenantId) => {
-    axios.post(`/api/tenants/resend-invitation/${tenantId}`)
-  }
 
   return <>
     <Crumbs crumbs={[{

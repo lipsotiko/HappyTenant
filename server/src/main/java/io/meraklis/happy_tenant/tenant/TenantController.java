@@ -8,7 +8,6 @@ import io.meraklis.happy_tenant.property.PropertyRepository;
 import io.meraklis.happy_tenant.security.AbstractAuditor;
 import io.meraklis.happy_tenant.security.CurrentUserAuditor;
 import io.meraklis.happy_tenant.user.landlord.LandlordUserRepository;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import java.util.stream.StreamSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -79,19 +77,5 @@ public class TenantController {
                         .orElseThrow())
                 .orElseThrow();
     }
-
-    @PostMapping("/resend-invitation/{tenantId}")
-    public void resendInvitation(@PathVariable("tenantId") String tenantId) {
-        Optional<String> currentUserEmail = currentUserAuditor.getCurrentAuditor();
-        Optional<Tenant> tenantById = tenantRepository.findById(tenantId);
-        tenantById.ifPresent(tenant -> currentUserEmail.ifPresent(email -> {
-            if (tenant.getCreatedBy().equals(email)) {
-                try {
-                    emailService.sendInvite(tenant);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }));
-    }
+    
 }
