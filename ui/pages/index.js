@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import Crumbs from 'components/Crumbs'
-import LoadingOverlay from 'components/LoadingOverlay'
+import { rnd2 } from 'util/utils'
 import Button from '@mui/material/Button';
 import { DataGrid } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
@@ -40,8 +40,9 @@ const Properties = () => {
       width: 148
     }, {
       field: 'rent',
-      headerName: 'Monthly Rent ($)',
-      width: 120
+      headerName: 'Monthly Rent',
+      width: 120,
+      renderCell: ({row: { rent }}) => `$${rnd2(rent)}`
     }
   ]
 

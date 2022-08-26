@@ -4,7 +4,7 @@ import Home from '@mui/icons-material/Home';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import AuthToken from 'components/AuthToken'
 import { TENANT_PORTAL_BASE_ROUTE } from 'util/constants'
-import store from 'hooks/store'
+import store from 'store/store'
 import { Provider } from 'react-redux'
 import LoadingOverlay from 'components/LoadingOverlay'
 

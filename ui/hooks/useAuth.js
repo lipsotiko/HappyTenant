@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
-import { showLoadingOverlay, hideLoadingOverlay } from 'hooks/reducers/loading'
+import { showLoadingOverlay, hideLoadingOverlay } from 'store/reducers/loading'
 import { useAuth0 } from "@auth0/auth0-react";
 import axios from 'axios';
 

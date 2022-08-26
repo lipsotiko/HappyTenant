@@ -34,5 +34,5 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
-landlord-portal-url: "https://happy-tenant.herokuapp.com"
-tenant-portal-url: "https://happy-tenant.herokuapp.com/tenant-portal"
+landlord-portal-url: ${BASE_APP_URL}
+tenant-portal-url: ${BASE_APP_URL}/tenant-portal

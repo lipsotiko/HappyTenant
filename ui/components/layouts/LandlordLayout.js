@@ -4,7 +4,7 @@ import AuthToken from 'components/AuthToken'
 import GroupsIcon from '@mui/icons-material/Groups';
 import MapsHomeWorkIcon from '@mui/icons-material/MapsHomeWork';
 import { MANAGEMENT_PORTAL_BASE_ROUTE, TENANTS_ROUTE } from 'util/constants'
-import store from 'hooks/store'
+import store from 'store/store'
 import { Provider } from 'react-redux'
 import LoadingOverlay from 'components/LoadingOverlay'
 
