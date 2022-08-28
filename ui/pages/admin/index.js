@@ -23,6 +23,10 @@ const Admin = () => {
       headerName: 'Organization',
       width: 158
     }, {
+      field: 'paymentAccountId',
+      headerName: 'Payment Account ID',
+      width: 212
+    }, {
       field: 'createdBy',
       headerName: 'Email',
       width: 244

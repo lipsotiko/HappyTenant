@@ -46,9 +46,7 @@ const Tenant = () => {
       <Grid item xs={1}><Typography variant="subtitle2">Billing start date:</Typography></Grid>
       <Grid item xs={11}>{tenant?.billingStartDate}</Grid>
     </Grid>
-    <Box sx={{ height: 400 }}>
-      <Invoices invoices={invoices} />
-    </Box>
+    <Invoices invoices={invoices}/>
   </>
 }
 

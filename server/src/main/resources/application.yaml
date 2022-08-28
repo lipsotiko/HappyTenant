@@ -22,7 +22,6 @@ email:
 landlord-portal-url: "http://localhost:3000"
 tenant-portal-url: "http://localhost:3000/tenant-portal"
 ---
-
 spring:
   profiles: test
   data:

@@ -41,8 +41,7 @@ import { TENANTS_ROUTE } from 'util/constants'
 const Create = () => {
   const { user } = useAuth0();
   const router = useRouter();
-  const [properties, setProperties] = useState([])
-  const [landlord, setLandlord] = useState()
+  const [properties, setProperties] = useState()
   const [saving, setSaving] = useState(false);
   const [moveInDate, setMoveInDate] = useState(null)
   const [billingStartDate, setBillingStartDate] = useState(null)
@@ -105,19 +104,6 @@ const Create = () => {
     fetchProperties()
   }, [user])
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      await axios.get('/api/landlord-user/profile', {
-        params: {
-          returnPath: '/tenants/create'
-        }
-      }).then(({ data }) => {
-        setLandlord(data)
-      })
-    }
-    fetchProfile()
-  }, [])
-
   const invoiceMemo = useMemo(() => {
     if (!properties) return []
     const propertyId = getValues('propertyId')
@@ -164,7 +150,7 @@ const Create = () => {
     return { items, total };
   }, [addProratedFirstMonthsRent, addLastMonthsRentToInvoice, addSecurityDepositToInvoice, securityDeposit, billingStartDate, getValues, moveInDate, properties])
 
-  if (!landlord || !properties) {
+  if (!properties) {
     return <></>
   }
 
@@ -191,6 +177,11 @@ const Create = () => {
         title: 'Create'
       }]}
     />
+    { properties.length === 0 &&
+      <Alert severity="warning" sx={{ margin: '8px' }}>
+        Click <Link className="pointer" href="/properties/create">here</Link> to add a property before inviting tenants.
+      </Alert>
+    }
     <Box m={2}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stepper activeStep={activeStep}>
@@ -404,7 +395,7 @@ const Create = () => {
               </Button>
               <Box sx={{ flex: '1 1 auto' }} />
               {activeStep < steps.length - 1 &&
-                <Button onClick={handleNext} disabled={!landlord?.paymentAccountStatus?.isOnboarded}>
+                <Button onClick={handleNext} disabled={properties.length === 0}>
                   Next
                 </Button>
               }
@@ -415,16 +406,6 @@ const Create = () => {
           </>
       </form>
     </Box>
-    { landlord?.paymentAccountStatus?.isOnboarded === false &&
-      <Alert severity="warning">
-        Click <Link className="pointer" href={landlord.paymentAccountStatus?.onboardingUrl}>here</Link> to configure your payout method with Stripe before inviting tenants.
-      </Alert>
-    }
-    { properties.length === 0 &&
-      <Alert severity="warning">
-        Click <Link className="pointer" href="/properties/create">here</Link> to add a property before inviting tenants.
-      </Alert>
-    }
   </>
 }
 
