@@ -379,6 +379,7 @@ const Create = () => {
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', padding: '8px' }}>
                           <Typography variant="h6">Total: ${invoiceMemo.total}</Typography>
                         </Box>
+                        <Typography variant="caption">**Note: First months rent will be billed separatly</Typography>
                       </Box>
                     }
                 </Box>

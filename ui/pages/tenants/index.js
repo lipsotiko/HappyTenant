@@ -66,7 +66,7 @@ const Tenants = () => {
     </Box>
     { landlord?.paymentAccountStatus?.isOnboarded === false &&
       <Alert severity="warning" sx={{margin: '8px'}}>
-        Click <Link className="pointer" target="_blank" href={landlord.paymentAccountStatus?.onboardingUrl}>here</Link> to configure your payout method with Stripe before inviting tenants.
+        Click <Link className="pointer" href={landlord.paymentAccountStatus?.onboardingUrl}>here</Link> to configure your payout method with Stripe before inviting tenants.
       </Alert>
     }
 
